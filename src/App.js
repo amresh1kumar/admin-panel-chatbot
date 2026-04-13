@@ -1,36 +1,36 @@
-// import { Layout } from "antd";
-// import Sidebar from "./components/Sidebar";
 // import ChatPage from "./pages/ChatPage";
-// import LeadsPage from "./pages/LeadsPage";
-// import { useState } from "react";
-
-// const { Sider, Content } = Layout;
+// import Onboarding from "./pages/Onboarding";
 
 // function App() {
-//   const [page, setPage] = useState("chat");
+//   const tenantId = localStorage.getItem("tenantId");
 
-//   return (
-//     <Layout style={{ height: "100vh" }}>
-//       <Sider>
-//         <Sidebar setPage={setPage} />
-//       </Sider>
-
-//       <Layout>
-//         <Content style={{ padding: 20 }}>
-//           {page === "chat" && <ChatPage />}
-//           {page === "leads" && <LeadsPage />}
-//         </Content>
-//       </Layout>
-//     </Layout>
-//   );
+//   return tenantId ? <ChatPage /> : <Onboarding />;
 // }
 
 // export default App;
 
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+import Dashboard from "./pages/Dashboard";
 import ChatPage from "./pages/ChatPage";
+import Leads from "./pages/Leads";
+import Onboarding from "./pages/Onboarding";
 
 function App() {
-  return <ChatPage />;
+  const tenantId = localStorage.getItem("tenantId");
+
+  if (!tenantId) return <Onboarding />;
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to="/dashboard" />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/leads" element={<Leads />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;
