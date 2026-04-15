@@ -1,6 +1,16 @@
 import { useEffect, useState, useRef } from "react";
 import { useTenant } from "../../context/TenantContext";
 import { getChats, sendChatMessage } from "../../services/chatService";
+import {
+   UserOutlined,
+   SendOutlined,
+   PaperClipOutlined,
+   SmileOutlined,
+   MoreOutlined,
+   PhoneOutlined,
+   VideoCameraOutlined
+} from "@ant-design/icons";
+import "../../styles/ChatWindow.css";
 
 export default function ChatWindow({ user }) {
    const { tenantId } = useTenant();
@@ -52,62 +62,69 @@ export default function ChatWindow({ user }) {
 
    if (!user) {
       return (
-         <div style={{ padding: "20px", color: "#888" }}>
-            Select a user to start chatting
+         <div className="chat-empty-state">
+            <div className="empty-content">
+               <div className="empty-icon-wrapper">
+                  💬
+               </div>
+               <h3 className="empty-title">WhatsApp Web</h3>
+               <p className="empty-text">
+                  Select a chat to start messaging
+               </p>
+            </div>
          </div>
       );
    }
 
    return (
-      <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-
+      <div className="chat-window">
          {/* Header */}
-         <div style={{
-            padding: "12px",
-            borderBottom: "1px solid #ddd",
-            background: "#fafafa"
-         }}>
-            <h3 style={{ margin: 0 }}>Chat: {user}</h3>
+         <div className="chat-header">
+            <div className="chat-header-left">
+               <div className="chat-avatar">
+                  <UserOutlined className="avatar-icon" />
+               </div>
+               <div className="chat-user-info">
+                  <h3 className="chat-user-name">{user}</h3>
+                  {/* <p className="chat-user-status">online</p> */}
+               </div>
+            </div>
+
+            {/* <div className="chat-header-actions">
+               <VideoCameraOutlined className="header-action-icon" />
+               <PhoneOutlined className="header-action-icon" />
+               <MoreOutlined className="header-action-icon" />
+            </div> */}
          </div>
 
-         {/* Messages */}
-         <div style={{
-            flex: 1,
-            overflowY: "auto",
-            padding: "20px",
-            background: "#f5f7fb"
-         }}>
-            {loading && <p>Loading...</p>}
+         {/* Messages Area */}
+         <div className="chat-messages">
+            {loading && (
+               <div className="chat-loading">
+                  <div className="loading-spinner"></div>
+                  <p>Loading messages...</p>
+               </div>
+            )}
 
-            {messages.map(msg => (
+            {!loading && messages.map((msg, index) => (
                <div
                   key={msg._id}
-                  style={{
-                     display: "flex",
-                     justifyContent:
-                        msg.type === "user" ? "flex-end" : "flex-start",
-                     marginBottom: "10px"
-                  }}
+                  className={`message-wrapper ${msg.type === "user" ? "user" : "bot"}`}
+                  style={{ animationDelay: `${index * 0.05}s` }}
                >
-                  <div
-                     style={{
-                        background: msg.type === "user" ? "#DCF8C6" : "#fff",
-                        padding: "10px 14px",
-                        borderRadius: "12px",
-                        maxWidth: "60%",
-                        boxShadow: "0 1px 2px rgba(0,0,0,0.1)"
-                     }}
-                  >
-                     {msg.message}
-
-                     <div style={{
-                        fontSize: "10px",
-                        textAlign: "right",
-                        marginTop: "4px",
-                        color: "#888"
-                     }}>
-                        {msg.createdAt &&
-                           new Date(msg.createdAt).toLocaleTimeString()}
+                  <div className={`message-bubble ${msg.type === "user" ? "user" : "bot"}`}>
+                     <div className="message-text">{msg.message}</div>
+                     <div className="message-meta">
+                        <span className="message-time">
+                           {msg.createdAt &&
+                              new Date(msg.createdAt).toLocaleTimeString([], {
+                                 hour: '2-digit',
+                                 minute: '2-digit'
+                              })}
+                        </span>
+                        {msg.type === "bot" && (
+                           <span className="message-status">✓✓</span>
+                        )}
                      </div>
                   </div>
                </div>
@@ -116,40 +133,33 @@ export default function ChatWindow({ user }) {
             <div ref={bottomRef}></div>
          </div>
 
-         {/* Input */}
-         <div style={{
-            padding: "10px",
-            borderTop: "1px solid #ddd",
-            display: "flex",
-            gap: "10px",
-            background: "#fff"
-         }}>
-            <input
-               value={input}
-               onChange={e => setInput(e.target.value)}
-               placeholder="Type message..."
-               onKeyDown={(e) => e.key === "Enter" && handleSend()}
-               style={{
-                  flex: 1,
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1px solid #ccc"
-               }}
-            />
+         {/* Input Area */}
+         <div className="chat-input-area">
+            <div className="chat-input-wrapper">
+               <button className="input-action-btn">
+                  <SmileOutlined className="input-icon" />
+               </button>
 
-            <button
-               onClick={handleSend}
-               style={{
-                  padding: "10px 16px",
-                  background: "#1677ff",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "8px",
-                  cursor: "pointer"
-               }}
-            >
-               Send
-            </button>
+               <button className="input-action-btn">
+                  <PaperClipOutlined className="input-icon" />
+               </button>
+
+               <input
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  placeholder="Type a message"
+                  onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                  className="chat-input"
+               />
+
+               <button
+                  onClick={handleSend}
+                  className="send-btn"
+                  disabled={!input.trim()}
+               >
+                  <SendOutlined className="send-icon" />
+               </button>
+            </div>
          </div>
       </div>
    );

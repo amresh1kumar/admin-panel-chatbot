@@ -1,48 +1,8 @@
-
-// import { useNavigate, useLocation } from "react-router-dom";
-
-// export default function Sidebar() {
-//    const navigate = useNavigate();
-//    const location = useLocation();
-
-//    const menu = [
-//       { key: "/dashboard", label: "Dashboard" },
-//       { key: "/chat", label: "Inbox" },
-//       { key: "/leads", label: "Leads" }
-//    ];
-
-//    return (
-//       <div style={{
-//          width: "240px",
-//          background: "#0f172a",
-//          color: "#fff",
-//          padding: "10px"
-//       }}>
-//          <h2 style={{ color: "#fff" }}>🚀 SaaS</h2>
-
-//          {menu.map(item => (
-//             <div
-//                key={item.key}
-//                onClick={() => navigate(item.key)}
-//                style={{
-//                   padding: "10px",
-//                   marginTop: "10px",
-//                   cursor: "pointer",
-//                   borderRadius: "6px",
-//                   background:
-//                      location.pathname === item.key ? "#1e293b" : "transparent"
-//                }}
-//             >
-//                {item.label}
-//             </div>
-//          ))}
-//       </div>
-//    );
-// }
-
 import { useNavigate, useLocation } from "react-router-dom";
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
+import API from "../../api/api";
+import { useTenant } from "../../context/TenantContext";
+import "../../styles/Sidebar.css";
 import {
    DashboardOutlined,
    MessageOutlined,
@@ -56,115 +16,206 @@ import {
    FacebookFilled,
    InstagramOutlined,
    GlobalOutlined,
-   LinkOutlined
+   LinkOutlined,
+   DoubleLeftOutlined,
+   DoubleRightOutlined,
+   UserAddOutlined
 } from "@ant-design/icons";
-import { SiGoogleads } from "react-icons/si";
+
 export default function Sidebar() {
    const navigate = useNavigate();
    const location = useLocation();
 
    const [openWhatsApp, setOpenWhatsApp] = useState(true);
+   const [collapsed, setCollapsed] = useState(false);
+   const { tenantId } = useTenant();
+   const [connected, setConnected] = useState(false);
 
    const isActive = (path) => location.pathname === path;
 
+
+   useEffect(() => {
+      if (!tenantId) return;
+
+      API.get(`/tenant/${tenantId}`)
+         .then(res => {
+            const t = res.data;
+
+            if (t.accessToken && t.phoneNumberId) {
+               setConnected(true);
+            } else {
+               setConnected(false);
+            }
+         })
+         .catch(() => setConnected(false));
+
+   }, [tenantId]);
    return (
-      <div
-         style={{
-            width: "250px",
-            background: "#fff",
-            color: "#000",
-            height: "90vh",
-            padding: "15px",
-         }}
-      >
-         <h2 style={{ marginBottom: "20px" }}>🚀 SaaS</h2>
+      <div className={`sidebar ${collapsed ? "collapsed" : ""}`}>
+         {/* Header */}
+         {/* <div className="sidebar-header">
+            {!collapsed ? (
+               <h2 className="sidebar-title">SP Advertising</h2>
+            ) : (
+               <span className="sidebar-logo">SP</span>
+            )}
+         </div> */}
 
-         {/* Dashboard */}
-         <div
-            onClick={() => navigate("/dashboard")}
-            style={menuStyle(isActive("/dashboard"))}
-         >
-            <DashboardOutlined /> <span style={{ marginLeft: 10 }}>Dashboard</span>
-         </div>
+         <div className="sidebar-header">
+            {!collapsed ? (
+               <div style={{ display: "flex", flexDirection: "column" }}>
 
-         {/* Shared Inbox */}
-         <div
-            onClick={() => navigate("/chat")}
-            style={menuStyle(isActive("/chat"))}
-         >
-            <MessageOutlined /> <span style={{ marginLeft: 10 }}>Shared Inbox</span>
-         </div>
-         <div
-            onClick={() => navigate("/leads")}
-            style={menuStyle(isActive("/leads"))}
-         >
-            <SiGoogleads /><span style={{ marginLeft: 10 }}>Leads</span>
-         </div>
+                  {/* EXISTING */}
+                  <h2 className="sidebar-title">SP Advertising</h2>
 
-         {/* WhatsApp Section */}
-         <div style={{ marginTop: "20px" }}>
-            <div
-               onClick={() => setOpenWhatsApp(!openWhatsApp)}
-               style={{ ...menuStyle(false), fontWeight: "bold" }}
-            >
-               <WhatsAppOutlined />
-               <span style={{ marginLeft: 10 }}>WhatsApp</span>
-               <span style={{ float: "right" }}>
-                  {openWhatsApp ? "▾" : "▸"}
-               </span>
-            </div>
+                  {/* 🔥 NEW ADD */}
+                  <div className="connection-status">
+                     <span
+                        className={`status-dot ${connected ? "status-connected" : "status-disconnected"
+                           }`}
+                     ></span>
 
-            {openWhatsApp && (
-               <div style={{ marginLeft: "15px" }}>
-                  <div style={menuStyle(false)}>
-                     <LinkOutlined /> <span style={{ marginLeft: 10 }}>Connect Account</span>
+                     <span className="status-text">
+                        {connected ? "Connected" : "Not Connected"}
+                     </span>
                   </div>
-                  {/* <div style={menuStyle(false)}>
-                     <RobotOutlined /> <span style={{ marginLeft: 10 }}>Bot Manager</span>
-                  </div>
-                  <div style={menuStyle(false)}>
-                     <TeamOutlined /> <span style={{ marginLeft: 10 }}>Subscriber Manager</span>
-                  </div>
-                  <div style={menuStyle(false)}>
-                     <SendOutlined /> <span style={{ marginLeft: 10 }}>Broadcasting</span>
-                  </div>
-                  <div style={menuStyle(false)}>
-                     <CommentOutlined /> <span style={{ marginLeft: 10 }}>Live Chat</span>
-                  </div>
-                  <div style={menuStyle(false)}>
-                     <ApiOutlined /> <span style={{ marginLeft: 10 }}>Webhook Workflow</span>
-                  </div>
-                  <div style={menuStyle(false)}>
-                     <SendOutlined /> <span style={{ marginLeft: 10 }}>Click Ads</span>
-                  </div>
-                  <div style={menuStyle(false)}>
-                     <ShoppingCartOutlined /> <span style={{ marginLeft: 10 }}>eCommerce Catalog</span>
-                  </div> */}
+
                </div>
+            ) : (
+               <span className="sidebar-logo">SP</span>
             )}
          </div>
 
-         {/* Social Section */}
-         {/* <div style={{ marginTop: "20px" }}>
-            <div style={menuStyle(false)}>
-               <FacebookFilled /> <span style={{ marginLeft: 10 }}>Facebook</span>
-            </div>
-            <div style={menuStyle(false)}>
-               <InstagramOutlined /> <span style={{ marginLeft: 10 }}>Instagram</span>
+         {/* Menu Items */}
+         <div className="sidebar-menu">
+            {/* Dashboard */}
+            <div
+               onClick={() => navigate("/dashboard")}
+               className={`menu-item ${isActive("/dashboard") ? "active" : ""}`}
+               title={collapsed ? "Dashboard" : ""}
+            >
+               <DashboardOutlined className="menu-icon" />
+               {!collapsed && <span className="menu-text">Dashboard</span>}
             </div>
 
-         </div> */}
+            {/* Shared Inbox */}
+            <div
+               onClick={() => navigate("/chat")}
+               className={`menu-item ${isActive("/chat") ? "active" : ""}`}
+               title={collapsed ? "Shared Inbox" : ""}
+            >
+               <MessageOutlined className="menu-icon" />
+               {!collapsed && <span className="menu-text">Shared Inbox</span>}
+            </div>
+
+            {/* Leads */}
+            <div
+               onClick={() => navigate("/leads")}
+               className={`menu-item ${isActive("/leads") ? "active" : ""}`}
+               title={collapsed ? "Leads" : ""}
+            >
+               <UserAddOutlined className="menu-icon" />
+               {!collapsed && <span className="menu-text">Leads</span>}
+            </div>
+
+
+
+            {/* WhatsApp Section */}
+            {!collapsed && (
+               <div className="menu-section">
+                  <div
+                     onClick={() => setOpenWhatsApp(!openWhatsApp)}
+                     className="section-header"
+                  >
+                     <div className="section-header-left">
+                        <WhatsAppOutlined className="menu-icon whatsapp-icon" />
+                        <span className="section-title">WhatsApp</span>
+                     </div>
+                     <span className="dropdown-arrow">
+                        {openWhatsApp ? "▾" : "▸"}
+                     </span>
+                  </div>
+
+                  <div className={`dropdown-menu ${openWhatsApp ? "open" : ""}`}>
+                     <div className="submenu-item">
+                        <LinkOutlined className="submenu-icon" />
+                        <span onClick={() => navigate("/create-account")} className="submenu-text">Connect Account</span>
+                     </div>
+                     {/* <div className="submenu-item">
+                        <RobotOutlined className="submenu-icon" />
+                        <span className="submenu-text">Bot Manager</span>
+                     </div>
+                     <div className="submenu-item">
+                        <TeamOutlined className="submenu-icon" />
+                        <span className="submenu-text">Subscriber Manager</span>
+                     </div>
+                     <div className="submenu-item">
+                        <SendOutlined className="submenu-icon" />
+                        <span className="submenu-text">Broadcasting</span>
+                     </div>
+                     <div className="submenu-item">
+                        <CommentOutlined className="submenu-icon" />
+                        <span className="submenu-text">Live Chat</span>
+                     </div> */}
+                     <div className="submenu-item">
+                        <ApiOutlined className="submenu-icon" />
+                        <span className="submenu-text">Webhook Workflow</span>
+                     </div>
+                     {/* <div className="submenu-item">
+                        <SendOutlined className="submenu-icon" />
+                        <span className="submenu-text">Click Ads</span>
+                     </div>
+                     <div className="submenu-item">
+                        <ShoppingCartOutlined className="submenu-icon" />
+                        <span className="submenu-text">eCommerce Catalog</span>
+                     </div> */}
+                  </div>
+               </div>
+            )}
+
+            {/* WhatsApp Icon Only (When Collapsed) */}
+            {collapsed && (
+               <div className="menu-item" title="WhatsApp">
+                  <WhatsAppOutlined className="menu-icon whatsapp-icon" />
+               </div>
+            )}
+
+            {/* Social Section */}
+            {/* <div className="menu-section">
+               {!collapsed && (
+                  <div className="section-label">SOCIAL</div>
+               )}
+               <div className="menu-item" title={collapsed ? "Facebook" : ""}>
+                  <FacebookFilled className="menu-icon facebook-icon" />
+                  {!collapsed && <span className="menu-text">Facebook</span>}
+               </div>
+               <div className="menu-item" title={collapsed ? "Instagram" : ""}>
+                  <InstagramOutlined className="menu-icon instagram-icon" />
+                  {!collapsed && <span className="menu-text">Instagram</span>}
+               </div>
+               <div className="menu-item" title={collapsed ? "Webchat" : ""}>
+                  <GlobalOutlined className="menu-icon" />
+                  {!collapsed && <span className="menu-text">Webchat</span>}
+               </div>
+            </div> */}
+         </div>
+
+         {/* Toggle Button */}
+         <div className="sidebar-footer">
+            <div
+               onClick={() => setCollapsed(!collapsed)}
+               className="toggle-btn"
+            >
+               {collapsed ? (
+                  <DoubleRightOutlined className="toggle-icon" />
+               ) : (
+                  <>
+                     <DoubleLeftOutlined className="toggle-icon" />
+                     <span className="toggle-text">Collapse</span>
+                  </>
+               )}
+            </div>
+         </div>
       </div>
    );
 }
-
-// style
-const menuStyle = (active) => ({
-   padding: "10px",
-   marginTop: "8px",
-   cursor: "pointer",
-   borderRadius: "6px",
-   display: "flex",
-   alignItems: "center",
-   background: active ? "skyblue" : "transparent",
-});

@@ -1,0 +1,37 @@
+.connect-container {
+   padding: 20px;
+}
+
+.success-container {
+   height: 100vh;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   background: #f0f2f5;
+}
+
+.success-card {
+   text-align: center;
+   padding: 40px;
+   background: #fff;
+   border-radius: 12px;
+   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.checkmark {
+   font-size: 60px;
+   color: #52c41a;
+   animation: pop 0.4s ease;
+}
+
+@keyframes pop {
+   0% {
+      transform: scale(0);
+      opacity: 0;
+   }
+
+   100% {
+      transform: scale(1);
+      opacity: 1;
+   }
+}
