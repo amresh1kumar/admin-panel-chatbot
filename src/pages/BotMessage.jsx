@@ -1,170 +1,3 @@
-// import { useEffect, useState } from "react";
-// import { Table, Button, Modal, Form, Input, message, Popconfirm } from "antd";
-
-// import {
-//    getBotMessages,
-//    createBotMessage,
-//    updateBotMessage,
-//    deleteBotMessage
-// } from "../services/botMessageService";
-
-// import { useTenant } from "../context/TenantContext";
-
-// export default function BotMessage() {
-//    const { tenantId } = useTenant();
-
-//    const [data, setData] = useState([]);
-//    const [loading, setLoading] = useState(false);
-//    const [open, setOpen] = useState(false);
-//    const [editing, setEditing] = useState(null);
-
-//    const [form] = Form.useForm();
-
-//    // 🔥 fetch
-//    const fetchData = async () => {
-//       setLoading(true);
-//       try {
-//          const res = await getBotMessages(tenantId);
-//          setData(res.data);
-//       } catch {
-//          message.error("Failed to load");
-//       }
-//       setLoading(false);
-//    };
-
-//    useEffect(() => {
-//       if (tenantId) fetchData();
-//    }, [tenantId]);
-
-//    // ➕ Submit
-//    const onFinish = async (values) => {
-//       try {
-//          if (editing) {
-//             await updateBotMessage(editing._id, values);
-//             message.success("Updated");
-//          } else {
-//             await createBotMessage({ ...values, tenantId });
-//             message.success("Created");
-//          }
-
-//          setOpen(false);
-//          form.resetFields();
-//          setEditing(null);
-//          fetchData();
-//       } catch {
-//          message.error("Error");
-//       }
-//    };
-
-//    // ✏️ Edit
-//    const handleEdit = (record) => {
-//       setEditing(record);
-//       setOpen(true);
-//       form.setFieldsValue(record);
-//    };
-
-//    // ❌ Delete
-//    const handleDelete = async (id) => {
-//       try {
-//          await deleteBotMessage(id);
-//          message.success("Deleted");
-//          fetchData();
-//       } catch {
-//          message.error("Delete failed");
-//       }
-//    };
-
-//    // 📊 columns
-//    const columns = [
-//       {
-//          title: "Keyword",
-//          dataIndex: "keyword"
-//       },
-//       {
-//          title: "Reply",
-//          dataIndex: "reply"
-//       },
-//       {
-//          title: "Actions",
-//          render: (_, record) => (
-//             <>
-//                <Button onClick={() => handleEdit(record)} size="small">
-//                   Edit
-//                </Button>
-
-//                <Popconfirm
-//                   title="Delete?"
-//                   onConfirm={() => handleDelete(record._id)}
-//                >
-//                   <Button danger size="small" style={{ marginLeft: 8 }}>
-//                      Delete
-//                   </Button>
-//                </Popconfirm>
-//             </>
-//          )
-//       }
-//    ];
-
-//    return (
-//       <div style={{ padding: "20px" }}>
-//          <h2>🤖 Bot Messages</h2>
-
-//          <Button
-//             type="primary"
-//             onClick={() => {
-//                setOpen(true);
-//                setEditing(null);
-//                form.resetFields();
-//             }}
-//             style={{ marginBottom: 15 }}
-//          >
-//             + Add Message
-//          </Button>
-
-//          <Table
-//             columns={columns}
-//             dataSource={data}
-//             rowKey="_id"
-//             loading={loading}
-//          />
-
-//          {/* Modal */}
-//          <Modal
-//             open={open}
-//             onCancel={() => setOpen(false)}
-//             onOk={() => form.submit()}
-//             title={editing ? "Edit Message" : "Add Message"}
-//          >
-//             <Form form={form} layout="vertical" onFinish={onFinish}>
-//                {/* <Form.Item
-//                   name="keyword"
-//                   label="Keyword"
-//                   rules={[{ required: true }]}
-//                >
-//                   <Input placeholder="hello / hi / pricing" />
-//                </Form.Item> */}
-
-//                <Form.Item
-//                   name="keywords"
-//                   label="Keywords (comma separated)"
-//                   rules={[{ required: true }]}
-//                >
-//                   <Input placeholder="hi, hello, hey" />
-//                </Form.Item>
-
-//                <Form.Item
-//                   name="reply"
-//                   label="Reply"
-//                   rules={[{ required: true }]}
-//                >
-//                   <Input.TextArea rows={4} placeholder="Enter reply..." />
-//                </Form.Item>
-//             </Form>
-//          </Modal>
-//       </div>
-//    );
-// }
-
 import { useEffect, useState } from "react";
 import {
    Table,
@@ -195,14 +28,14 @@ export default function BotMessage() {
 
    const [form] = Form.useForm();
 
-   // 🔥 Fetch Data
+   // ================= FETCH =================
    const fetchData = async () => {
       setLoading(true);
       try {
          const res = await getBotMessages(tenantId);
          setData(res.data || []);
       } catch {
-         message.error("Failed to load bot messages");
+         message.error("Failed to load messages");
       }
       setLoading(false);
    };
@@ -211,25 +44,28 @@ export default function BotMessage() {
       if (tenantId) fetchData();
    }, [tenantId]);
 
-   // 🔥 Submit (Create / Update)
+   // ================= SUBMIT =================
    const onFinish = async (values) => {
       try {
          const formatted = {
             ...values,
+
+            // 🔥 MULTIPLE KEYWORDS
             keywords: values.keywords
                .split(",")
                .map(k => k.trim().toLowerCase())
+               .filter(k => k !== "")
          };
 
          if (editing) {
             await updateBotMessage(editing._id, formatted);
-            message.success("Updated successfully");
+            message.success("Updated");
          } else {
             await createBotMessage({
                ...formatted,
                tenantId
             });
-            message.success("Created successfully");
+            message.success("Created");
          }
 
          setOpen(false);
@@ -237,23 +73,23 @@ export default function BotMessage() {
          form.resetFields();
          fetchData();
 
-      } catch {
-         message.error("Something went wrong");
+      } catch (err) {
+         message.error(err.message || "Error saving message");
       }
    };
 
-   // 🔥 Edit
+   // ================= EDIT =================
    const handleEdit = (record) => {
       setEditing(record);
       setOpen(true);
 
       form.setFieldsValue({
          ...record,
-         keywords: record.keywords.join(", ")
+         keywords: record.keywords?.join(",") // 🔥 FIX
       });
    };
 
-   // 🔥 Delete
+   // ================= DELETE =================
    const handleDelete = async (id) => {
       try {
          await deleteBotMessage(id);
@@ -264,7 +100,7 @@ export default function BotMessage() {
       }
    };
 
-   // 📊 Table Columns
+   // ================= TABLE =================
    const columns = [
       {
          title: "Keywords",
@@ -275,25 +111,22 @@ export default function BotMessage() {
          dataIndex: "reply"
       },
       {
-         title: "Actions",
+         title: "Flow Action", // 🔥 CHANGE NAME
+         dataIndex: "action"
+      },
+      {
+         title: "Actions", // 🔥 BUTTON COLUMN
          render: (_, record) => (
             <>
-               <Button
-                  size="small"
-                  onClick={() => handleEdit(record)}
-               >
+               <Button size="small" onClick={() => handleEdit(record)}>
                   Edit
                </Button>
 
                <Popconfirm
-                  title="Delete this message?"
+                  title="Delete message?"
                   onConfirm={() => handleDelete(record._id)}
                >
-                  <Button
-                     danger
-                     size="small"
-                     style={{ marginLeft: 8 }}
-                  >
+                  <Button danger size="small" style={{ marginLeft: 8 }}>
                      Delete
                   </Button>
                </Popconfirm>
@@ -304,16 +137,16 @@ export default function BotMessage() {
 
    return (
       <div style={{ padding: "20px" }}>
-         <h2>🤖 Bot Messages</h2>
+         <h2>💬 Bot Messages</h2>
 
          <Button
             type="primary"
-            style={{ marginBottom: 15 }}
             onClick={() => {
                setOpen(true);
                setEditing(null);
                form.resetFields();
             }}
+            style={{ marginBottom: 15 }}
          >
             + Add Message
          </Button>
@@ -325,10 +158,10 @@ export default function BotMessage() {
             loading={loading}
          />
 
-         {/* 🔥 Modal */}
+         {/* ================= MODAL ================= */}
          <Modal
             open={open}
-            title={editing ? "Edit Bot Message" : "Add Bot Message"}
+            title={editing ? "Edit Message" : "Add Message"}
             onCancel={() => setOpen(false)}
             onOk={() => form.submit()}
          >
@@ -339,15 +172,25 @@ export default function BotMessage() {
                   label="Keywords (comma separated)"
                   rules={[{ required: true }]}
                >
-                  <Input placeholder="hi, hello, hey" />
+                  <Input placeholder="hi,hello,hey" />
                </Form.Item>
 
                <Form.Item
                   name="reply"
-                  label="Reply"
+                  label="Reply Message"
                   rules={[{ required: true }]}
                >
-                  <Input.TextArea rows={4} placeholder="Enter reply..." />
+                  <Input.TextArea
+                     rows={4}
+                     placeholder="Enter reply text"
+                  />
+               </Form.Item>
+
+               <Form.Item
+                  name="action"
+                  label="Action (optional)"
+               >
+                  <Input placeholder="menu / services / ask_name" />
                </Form.Item>
 
             </Form>

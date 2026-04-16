@@ -141,10 +141,15 @@ export default function Sidebar() {
                         <LinkOutlined className="submenu-icon" />
                         <span onClick={() => navigate("/create-account")} className="submenu-text">Connect Account</span>
                      </div>
-                     {/* <div className="submenu-item">
+                     <div className="submenu-item">
                         <RobotOutlined className="submenu-icon" />
-                        <span className="submenu-text">Bot Manager</span>
+                        <span onClick={() => navigate("/bot-messages")} className="submenu-text">Bot Manager</span>
                      </div>
+                     <div className="submenu-item">
+                        <RobotOutlined className="submenu-icon" />
+                        <span onClick={() => navigate("/bot-menus")} className="submenu-text">Bot Menus</span>
+                     </div>
+                     {/*
                      <div className="submenu-item">
                         <TeamOutlined className="submenu-icon" />
                         <span className="submenu-text">Subscriber Manager</span>

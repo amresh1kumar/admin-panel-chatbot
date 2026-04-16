@@ -9,6 +9,7 @@ import ConnectAccount from "./pages/ConnectAccount";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import BotMessage from "./pages/BotMessage";
+import BotMenu from "./pages/BotMenu";
 
 import { useAuth } from "./context/AuthContext";
 
@@ -32,6 +33,8 @@ function App() {
           <Route path="/leads" element={<Leads />} />
           <Route path="/create-account" element={<ConnectAccount />} />
           <Route path="/bot-messages" element={<BotMessage />} />
+          <Route path="/bot-menus" element={<BotMenu/>} />
+          
         </Route>
 
         {/* Default */}
