@@ -143,7 +143,7 @@ export default function Sidebar() {
                      </div>
                      <div className="submenu-item">
                         <RobotOutlined className="submenu-icon" />
-                        <span onClick={() => navigate("/bot-messages")} className="submenu-text">Bot Manager</span>
+                        <span onClick={() => navigate("/bot-messages")} className="submenu-text">Bot Message</span>
                      </div>
                      <div className="submenu-item">
                         <RobotOutlined className="submenu-icon" />

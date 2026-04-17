@@ -6,8 +6,12 @@ import {
    Form,
    Input,
    message,
-   Popconfirm
+   Popconfirm,
+   Card,
+   Space,
+   Empty
 } from "antd";
+import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 
 import {
    getMenus,
@@ -102,7 +106,7 @@ export default function BotMenu() {
 
       form.setFieldsValue({
          ...record,
-         trigger: record.trigger?.join(","), // 🔥 FIX
+         trigger: record.trigger?.join(","),
          options: record.options
             ?.map(o => `${o.id},${o.title}`)
             .join("\n")
@@ -124,114 +128,164 @@ export default function BotMenu() {
    const columns = [
       {
          title: "Menu Name",
-         dataIndex: "name"
+         dataIndex: "name",
+         key: "name",
+         width: "20%"
       },
       {
          title: "Trigger",
-         render: (_, record) => record.trigger?.join(", ")
+         key: "trigger",
+         width: "20%",
+         render: (_, record) => (
+            <span>{record.trigger?.join(", ")}</span>
+         )
       },
       {
          title: "Body",
-         dataIndex: "body"
+         dataIndex: "body",
+         key: "body",
+         width: "25%",
+         ellipsis: true
       },
       {
          title: "Options",
-         render: (_, record) =>
-            record.options?.map(o => o.title).join(", ")
+         key: "options",
+         width: "20%",
+         render: (_, record) => (
+            <span>{record.options?.map(o => o.title).join(", ")}</span>
+         )
       },
       {
          title: "Actions",
+         key: "actions",
+         width: "15%",
+         align: "center",
          render: (_, record) => (
-            <>
-               <Button size="small" onClick={() => handleEdit(record)}>
+            <Space size="small">
+               <Button
+                  type="primary"
+                  size="small"
+                  icon={<EditOutlined />}
+                  onClick={() => handleEdit(record)}
+               >
                   Edit
                </Button>
 
                <Popconfirm
-                  title="Delete menu?"
+                  title="Delete"
+                  description="Are you sure to delete this menu?"
                   onConfirm={() => handleDelete(record._id)}
+                  okText="Yes"
+                  cancelText="No"
                >
-                  <Button danger size="small" style={{ marginLeft: 8 }}>
+                  <Button
+                     danger
+                     size="small"
+                     icon={<DeleteOutlined />}
+                  >
                      Delete
                   </Button>
                </Popconfirm>
-            </>
+            </Space>
          )
       }
    ];
 
    return (
-      <div style={{ padding: "20px" }}>
-         <h2>📋 Bot Menus</h2>
+      <div style={{ padding: "24px", background: "#f5f5f5", minHeight: "100vh" }}>
+         <Card>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+               <h2 style={{ margin: 0 }}>📋 Bot Menus</h2>
+               <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={() => {
+                     setOpen(true);
+                     setEditing(null);
+                     form.resetFields();
+                  }}
+               >
+                  Add Menu
+               </Button>
+            </div>
 
-         <Button
-            type="primary"
-            onClick={() => {
-               setOpen(true);
-               setEditing(null);
-               form.resetFields();
-            }}
-            style={{ marginBottom: 15 }}
-         >
-            + Add Menu
-         </Button>
-
-         <Table
-            columns={columns}
-            dataSource={data}
-            rowKey="_id"
-            loading={loading}
-         />
+            <Table
+               columns={columns}
+               dataSource={data}
+               rowKey="_id"
+               loading={loading}
+               locale={{ emptyText: <Empty description="No menus found" /> }}
+               pagination={{ pageSize: 10 }}
+               bordered
+               scroll={{x:1200}}
+            />
+         </Card>
 
          {/* ================= MODAL ================= */}
          <Modal
             open={open}
             title={editing ? "Edit Menu" : "Add Menu"}
-            onCancel={() => setOpen(false)}
+            onCancel={() => {
+               setOpen(false);
+               setEditing(null);
+               form.resetFields();
+            }}
             onOk={() => form.submit()}
+            width={600}
+            okText={editing ? "Update" : "Create"}
          >
             <Form layout="vertical" form={form} onFinish={onFinish}>
 
                <Form.Item
                   name="name"
                   label="Menu Name"
-                  rules={[{ required: true }]}
+                  rules={[
+                     { required: true, message: "Menu name is required" }
+                  ]}
                >
-                  <Input placeholder="mainMenu / servicesMenu" />
+                  <Input placeholder="e.g., mainMenu, servicesMenu" />
                </Form.Item>
 
                <Form.Item
                   name="trigger"
-                  label="Trigger (comma separated)"
-                  rules={[{ required: true }]}
+                  label="Trigger Words (comma separated)"
+                  rules={[
+                     { required: true, message: "Trigger words are required" }
+                  ]}
                >
-                  <Input placeholder="hi,hello,hey" />
+                  <Input placeholder="e.g., hi, hello, hey" />
                </Form.Item>
 
                <Form.Item
                   name="body"
                   label="Menu Text"
-                  rules={[{ required: true }]}
+                  rules={[
+                     { required: true, message: "Menu text is required" }
+                  ]}
                >
-                  <Input placeholder="Choose an option" />
+                  <Input.TextArea rows={3} placeholder="e.g., Choose an option below" />
                </Form.Item>
 
                <Form.Item
                   name="button"
                   label="Button Text"
-                  rules={[{ required: true }]}
+                  rules={[
+                     { required: true, message: "Button text is required" }
+                  ]}
                >
-                  <Input placeholder="Menu" />
+                  <Input placeholder="e.g., Menu" />
                </Form.Item>
 
                <Form.Item
                   name="options"
                   label="Options (id,title per line)"
-                  rules={[{ required: true }]}
+                  rules={[
+                     { required: true, message: "At least one option is required" }
+                  ]}
                >
                   <Input.TextArea
                      rows={5}
-                     placeholder={`services,Services\npricing,Pricing`}
+                     placeholder={"services,Services\npricing,Pricing\ncontact,Contact Us"}
                   />
                </Form.Item>
 

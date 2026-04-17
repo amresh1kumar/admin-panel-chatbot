@@ -11,11 +11,13 @@ export default function Register() {
       }
 
       if (!values.agree) {
-         return message.error("Please accept Terms");
+         return message.error("Please accept Terms & Privacy Policy");
       }
 
       try {
-         await API.post("/auth/register", values);
+         const { confirmPassword, agree, ...registerData } = values;
+
+         await API.post("/auth/register", registerData);
          message.success("Account created successfully!");
          navigate("/login");
       } catch (err) {
@@ -32,13 +34,27 @@ export default function Register() {
 
                <Row gutter={12}>
                   <Col span={12}>
-                     <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+                     <Form.Item
+                        name="name"
+                        label="Name"
+                        rules={[
+                           { required: true, message: "Name required" },
+                           { min: 2, message: "Minimum 2 characters" }
+                        ]}
+                     >
                         <Input placeholder="Enter name" />
                      </Form.Item>
                   </Col>
 
                   <Col span={12}>
-                     <Form.Item name="email" label="Email" rules={[{ required: true }]}>
+                     <Form.Item
+                        name="email"
+                        label="Email"
+                        rules={[
+                           { required: true, message: "Email required" },
+                           { type: "email", message: "Valid email enter karo" }
+                        ]}
+                     >
                         <Input placeholder="Enter email" />
                      </Form.Item>
                   </Col>
@@ -46,7 +62,11 @@ export default function Register() {
 
                <Row gutter={12}>
                   <Col span={8}>
-                     <Form.Item name="countryCode" label="Code" initialValue="+91">
+                     <Form.Item
+                        name="countryCode"
+                        label="Code"
+                        initialValue="+91"
+                     >
                         <Input />
                      </Form.Item>
                   </Col>
@@ -55,7 +75,10 @@ export default function Register() {
                      <Form.Item
                         name="whatsappNumber"
                         label="WhatsApp Number"
-                        rules={[{ required: true }]}
+                        rules={[
+                           { required: true, message: "Number required" },
+                           { pattern: /^[0-9]{10}$/, message: "10 digit number enter karo" }
+                        ]}
                      >
                         <Input placeholder="Enter number" />
                      </Form.Item>
@@ -68,7 +91,14 @@ export default function Register() {
 
                <Row gutter={12}>
                   <Col span={12}>
-                     <Form.Item name="password" label="Password" rules={[{ required: true }]}>
+                     <Form.Item
+                        name="password"
+                        label="Password"
+                        rules={[
+                           { required: true, message: "Password required" },
+                           { min: 6, message: "Minimum 6 characters" }
+                        ]}
+                     >
                         <Input.Password />
                      </Form.Item>
                   </Col>
@@ -77,7 +107,9 @@ export default function Register() {
                      <Form.Item
                         name="confirmPassword"
                         label="Confirm Password"
-                        rules={[{ required: true }]}
+                        rules={[
+                           { required: true, message: "Confirm password required" }
+                        ]}
                      >
                         <Input.Password />
                      </Form.Item>
@@ -117,6 +149,6 @@ const container = {
 };
 
 const card = {
-   width: 500, // 🔥 wider for horizontal layout
+   width: 500,
    borderRadius: "10px"
 };

@@ -1,16 +1,21 @@
 import { Form, Input, Button, Card, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
+import { useAuth } from "../context/AuthContext"; // ✅ Import
+import { useTenant } from "../context/TenantContext"; // ✅ Import
 
 export default function Login() {
    const navigate = useNavigate();
+   const { login } = useAuth(); // ✅ Use context function
+   const { saveTenant } = useTenant(); // ✅ Use tenant function
 
    const onFinish = async (values) => {
       try {
          const res = await API.post("/auth/login", values);
 
-         localStorage.setItem("token", res.data.token);
-         localStorage.setItem("tenantId", res.data.tenantId);
+         // ✅ Context ke login() function use karo
+         login(res.data.token);
+         saveTenant(res.data.tenantId);
 
          message.success("Login Successful");
 
@@ -26,11 +31,25 @@ export default function Login() {
             <h2 style={{ textAlign: "center" }}>🔐 Login</h2>
 
             <Form layout="vertical" onFinish={onFinish}>
-               <Form.Item name="email" label="Email" rules={[{ required: true }]}>
+               <Form.Item
+                  name="email"
+                  label="Email"
+                  rules={[
+                     { required: true, message: "Email required" },
+                     { type: "email", message: "Valid email enter karo" }
+                  ]}
+               >
                   <Input placeholder="Enter email" />
                </Form.Item>
 
-               <Form.Item name="password" label="Password" rules={[{ required: true }]}>
+               <Form.Item
+                  name="password"
+                  label="Password"
+                  // rules={[
+                  //    { required: true, message: "Password required" },
+                  //    { min: 6, message: "Minimum 6 characters" }
+                  // ]}
+               >
                   <Input.Password placeholder="Enter password" />
                </Form.Item>
 
@@ -41,7 +60,7 @@ export default function Login() {
 
             {/* 🔗 NAVIGATION */}
             <p style={{ textAlign: "center", marginTop: "15px" }}>
-               Don’t have an account?{" "}
+               Don't have an account?{" "}
                <span
                   onClick={() => navigate("/register")}
                   style={{ color: "#1677ff", cursor: "pointer", fontWeight: "500" }}
