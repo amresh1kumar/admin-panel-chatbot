@@ -6,8 +6,12 @@
 //    Form,
 //    Input,
 //    message,
-//    Popconfirm
+//    Popconfirm,
+//    Card,
+//    Space,
+//    Empty
 // } from "antd";
+// import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 
 // import {
 //    getBotMessages,
@@ -54,7 +58,9 @@
 //             keywords: values.keywords
 //                .split(",")
 //                .map(k => k.trim().toLowerCase())
-//                .filter(k => k !== "")
+//                .filter(k => k !== ""),
+
+//                action: values.action?.trim() ? values.action.trim() : null
 //          };
 
 //          if (editing) {
@@ -85,7 +91,7 @@
 
 //       form.setFieldsValue({
 //          ...record,
-//          keywords: record.keywords?.join(",") // 🔥 FIX
+//          keywords: record.keywords?.join(",")
 //       });
 //    };
 
@@ -104,85 +110,127 @@
 //    const columns = [
 //       {
 //          title: "Keywords",
-//          render: (_, record) => record.keywords?.join(", ")
+//          dataIndex: "keywords",
+//          key: "keywords",
+//          width: "20%",
+//          render: (keywords) => (
+//             <span>{keywords?.join(", ")}</span>
+//          )
 //       },
 //       {
 //          title: "Reply",
-//          dataIndex: "reply"
+//          dataIndex: "reply",
+//          key: "reply",
+//          width: "35%",
+//          ellipsis: true
 //       },
 //       {
-//          title: "Flow Action", // 🔥 CHANGE NAME
-//          dataIndex: "action"
+//          title: "Flow Action",
+//          dataIndex: "action",
+//          key: "action",
+//          width: "20%"
 //       },
 //       {
-//          title: "Actions", // 🔥 BUTTON COLUMN
+//          title: "Actions",
+//          key: "actions",
+//          width: "25%",
+//          align: "center",
 //          render: (_, record) => (
-//             <>
-//                <Button size="small" onClick={() => handleEdit(record)}>
+//             <Space size="small">
+//                <Button
+//                   type="primary"
+//                   size="small"
+//                   icon={<EditOutlined />}
+//                   onClick={() => handleEdit(record)}
+//                >
 //                   Edit
 //                </Button>
 
 //                <Popconfirm
-//                   title="Delete message?"
+//                   title="Delete"
+//                   description="Are you sure to delete this message?"
 //                   onConfirm={() => handleDelete(record._id)}
+//                   okText="Yes"
+//                   cancelText="No"
 //                >
-//                   <Button danger size="small" style={{ marginLeft: 8 }}>
+//                   <Button
+//                      danger
+//                      size="small"
+//                      icon={<DeleteOutlined />}
+//                   >
 //                      Delete
 //                   </Button>
 //                </Popconfirm>
-//             </>
+//             </Space>
 //          )
 //       }
 //    ];
 
 //    return (
-//       <div style={{ padding: "20px" }}>
-//          <h2>💬 Bot Messages</h2>
+//       <div style={{ padding: "24px", background: "#f5f5f5", minHeight: "100vh" }}>
+//          <Card>
+//             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+//                <h2 style={{ margin: 0 }}>💬 Bot Messages</h2>
+//                <Button
+//                   type="primary"
+//                   icon={<PlusOutlined />}
+//                   onClick={() => {
+//                      setOpen(true);
+//                      setEditing(null);
+//                      form.resetFields();
+//                   }}
+//                >
+//                   Add Message
+//                </Button>
+//             </div>
 
-//          <Button
-//             type="primary"
-//             onClick={() => {
-//                setOpen(true);
-//                setEditing(null);
-//                form.resetFields();
-//             }}
-//             style={{ marginBottom: 15 }}
-//          >
-//             + Add Message
-//          </Button>
-
-//          <Table
-//             columns={columns}
-//             dataSource={data}
-//             rowKey="_id"
-//             loading={loading}
-//          />
+//             <Table
+//                columns={columns}
+//                dataSource={data}
+//                rowKey="_id"
+//                loading={loading}
+//                locale={{ emptyText: <Empty description="No messages found" /> }}
+//                pagination={{ pageSize: 10 }}
+//                bordered
+//                scroll={{ x: 1200 }}
+//             />
+//          </Card>
 
 //          {/* ================= MODAL ================= */}
 //          <Modal
 //             open={open}
 //             title={editing ? "Edit Message" : "Add Message"}
-//             onCancel={() => setOpen(false)}
+//             onCancel={() => {
+//                setOpen(false);
+//                setEditing(null);
+//                form.resetFields();
+//             }}
 //             onOk={() => form.submit()}
+//             width={600}
+//             okText={editing ? "Update" : "Create"}
 //          >
 //             <Form layout="vertical" form={form} onFinish={onFinish}>
 
 //                <Form.Item
 //                   name="keywords"
 //                   label="Keywords (comma separated)"
-//                   rules={[{ required: true }]}
+//                   rules={[
+//                      { required: true, message: "Keywords are required" }
+//                   ]}
 //                >
-//                   <Input placeholder="hi,hello,hey" />
+//                   <Input placeholder="e.g., hi, hello, hey" />
 //                </Form.Item>
 
 //                <Form.Item
 //                   name="reply"
 //                   label="Reply Message"
-//                   rules={[{ required: true }]}
+//                   rules={[
+//                      { required: true, message: "Reply message is required" }
+//                   ]}
 //                >
 //                   <Input.TextArea
 //                      rows={4}
-//                      placeholder="Enter reply text"
+//                      placeholder="e.g., Hello! How can I help you today?"
 //                   />
 //                </Form.Item>
 
@@ -190,7 +238,7 @@
 //                   name="action"
 //                   label="Action (optional)"
 //                >
-//                   <Input placeholder="menu / services / ask_name" />
+//                   <Input placeholder="e.g., menu, services, ask_name" />
 //                </Form.Item>
 
 //             </Form>
@@ -313,7 +361,7 @@ export default function BotMessage() {
          title: "Keywords",
          dataIndex: "keywords",
          key: "keywords",
-         width: "20%",
+         width: 200,
          render: (keywords) => (
             <span>{keywords?.join(", ")}</span>
          )
@@ -322,20 +370,21 @@ export default function BotMessage() {
          title: "Reply",
          dataIndex: "reply",
          key: "reply",
-         width: "35%",
+         width: 350,
          ellipsis: true
       },
       {
          title: "Flow Action",
          dataIndex: "action",
          key: "action",
-         width: "20%"
+         width: 200
       },
       {
          title: "Actions",
          key: "actions",
-         width: "25%",
+         width: 100,
          align: "center",
+         fixed: "right", // 🔥 RIGHT ME STICKY
          render: (_, record) => (
             <Space size="small">
                <Button
@@ -344,7 +393,7 @@ export default function BotMessage() {
                   icon={<EditOutlined />}
                   onClick={() => handleEdit(record)}
                >
-                  Edit
+                  
                </Button>
 
                <Popconfirm
@@ -359,7 +408,7 @@ export default function BotMessage() {
                      size="small"
                      icon={<DeleteOutlined />}
                   >
-                     Delete
+                  
                   </Button>
                </Popconfirm>
             </Space>
@@ -368,9 +417,9 @@ export default function BotMessage() {
    ];
 
    return (
-      <div style={{ padding: "24px", background: "#f5f5f5", minHeight: "100vh" }}>
+      <div style={{ background: "#f5f5f5", minHeight: "80vh" }}>
          <Card>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
                <h2 style={{ margin: 0 }}>💬 Bot Messages</h2>
                <Button
                   type="primary"
@@ -393,7 +442,13 @@ export default function BotMessage() {
                locale={{ emptyText: <Empty description="No messages found" /> }}
                pagination={{ pageSize: 10 }}
                bordered
-               scroll={{ x: 1200 }}
+               sticky // 🔥 HEADER KO STICKY BANATA HAI
+               scroll={{ 
+                  x: 1000, // Horizontal scroll
+                  y: '65vh' // Vertical scroll with sticky header
+               }}
+               size="small"
+               
             />
          </Card>
 
