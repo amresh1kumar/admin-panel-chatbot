@@ -21,6 +21,7 @@ import {
    DoubleRightOutlined,
    UserAddOutlined
 } from "@ant-design/icons";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Sidebar() {
    const navigate = useNavigate();
@@ -32,6 +33,7 @@ export default function Sidebar() {
    const [connected, setConnected] = useState(false);
 
    const isActive = (path) => location.pathname === path;
+   const { logout } = useAuth();
 
 
    useEffect(() => {
@@ -50,6 +52,11 @@ export default function Sidebar() {
          .catch(() => setConnected(false));
 
    }, [tenantId]);
+
+   const handleLogout = () => {
+      logout();
+      navigate("/login");
+   };
    return (
       <div className={`sidebar ${collapsed ? "collapsed" : ""}`}>
          {/* Header */}
@@ -207,6 +214,18 @@ export default function Sidebar() {
 
          {/* Toggle Button */}
          <div className="sidebar-footer">
+
+            {/* 🔥 LOGOUT */}
+            <div
+               onClick={handleLogout}
+               className="menu-item"
+               style={{ cursor: "pointer", color: "#ff4d4f" }}
+            >
+               <span className="menu-icon">🚪</span>
+               {!collapsed && <span className="menu-text">Logout</span>}
+            </div>
+
+            {/* EXISTING */}
             <div
                onClick={() => setCollapsed(!collapsed)}
                className="toggle-btn"
@@ -220,6 +239,7 @@ export default function Sidebar() {
                   </>
                )}
             </div>
+
          </div>
       </div>
    );

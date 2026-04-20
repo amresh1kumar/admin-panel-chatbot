@@ -111,95 +111,82 @@ export default function Leads() {
    ];
 
    return (
-         <div className="leads-container">
-            {/* Header */}
-            <div className="leads-header">
-               <div className="leads-header-left">
-                  <h1 className="leads-title">Leads</h1>
-                  <p className="leads-subtitle">
-                     Manage and track your leads
-                  </p>
-               </div>
-               {/* <div className="leads-header-actions">
-                  <Button
-                     icon={<DownloadOutlined />}
-                     className="header-btn"
-                  >
-                     Export
-                  </Button>
-                  <Button
-                     type="primary"
-                     icon={<PlusOutlined />}
-                     className="header-btn primary"
-                  >
-                     Add Lead
-                  </Button>
-               </div> */}
+      <div className="leads-container">
+         {/* Header */}
+         <div className="leads-header">
+            <div className="leads-header-left">
+               <h1 className="leads-title">Leads</h1>
+               <p className="leads-subtitle">
+                  Manage and track your leads
+               </p>
             </div>
 
-            {/* Stats Cards */}
-            <div className="leads-stats">
-               <div className="stat-card">
-                  <div className="stat-value">{leads.length}</div>
-                  <div className="stat-label">Total Leads</div>
-               </div>
-               <div className="stat-card">
-                  <div className="stat-value">
-                     {leads.filter(l => {
-                        const date = new Date(l.createdAt);
-                        const today = new Date();
-                        return date.toDateString() === today.toDateString();
-                     }).length}
-                  </div>
-                  <div className="stat-label">Today</div>
-               </div>
-               <div className="stat-card">
-                  <div className="stat-value">
-                     {leads.filter(l => {
-                        const date = new Date(l.createdAt);
-                        const weekAgo = new Date();
-                        weekAgo.setDate(weekAgo.getDate() - 7);
-                        return date >= weekAgo;
-                     }).length}
-                  </div>
-                  <div className="stat-label">This Week</div>
-               </div>
-            </div>
+         </div>
 
-            {/* Filters */}
-            <div className="leads-filters">
-               <Input
-                  placeholder="Search by name, phone, or business..."
-                  prefix={<SearchOutlined />}
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  className="search-input"
-                  allowClear
-               />
-               {/* <Button
+         {/* Stats Cards */}
+         <div className="leads-stats">
+            <div className="stat-card">
+               <div className="stat-value">{leads.length}</div>
+               <div className="stat-label">Total Leads</div>
+            </div>
+            <div className="stat-card">
+               <div className="stat-value">
+                  {leads.filter(l => {
+                     const date = new Date(l.createdAt);
+                     const today = new Date();
+                     return date.toDateString() === today.toDateString();
+                  }).length}
+               </div>
+               <div className="stat-label">Today</div>
+            </div>
+            <div className="stat-card">
+               <div className="stat-value">
+                  {leads.filter(l => {
+                     const date = new Date(l.createdAt);
+                     const weekAgo = new Date();
+                     weekAgo.setDate(weekAgo.getDate() - 7);
+                     return date >= weekAgo;
+                  }).length}
+               </div>
+               <div className="stat-label">This Week</div>
+            </div>
+         </div>
+
+         {/* Filters */}
+         <div className="leads-filters">
+            <Input
+               placeholder="Search by name, phone, or business..."
+               prefix={<SearchOutlined />}
+               value={searchText}
+               onChange={(e) => setSearchText(e.target.value)}
+               className="search-input"
+               allowClear
+            />
+            {/* <Button
                   icon={<FilterOutlined />}
                   className="filter-btn"
                >
                   Filters
                </Button> */}
-            </div>
-
-            {/* Table */}
-            <div className="leads-table-container">
-               <Table
-                  columns={columns}
-                  dataSource={filteredLeads}
-                  rowKey="_id"
-                  loading={loading}
-                  pagination={{
-                     pageSize: 10,
-                     showTotal: (total) => `Total ${total} leads`,
-                     showSizeChanger: true,
-                     pageSizeOptions: ['10', '20', '50', '100']
-                  }}
-                  className="leads-table"
-               />
-            </div>
          </div>
+
+         {/* Table */}
+         <div className="leads-table-container">
+            <Table
+               columns={columns}
+               dataSource={filteredLeads}
+               rowKey="_id"
+               loading={loading}
+               pagination={{
+                  pageSize: 10,
+                  showTotal: (total) => `Total ${total} leads`,
+                  showSizeChanger: true,
+                  pageSizeOptions: ['10', '20', '50', '100']
+               }}
+               size="small"
+               className="leads-table"
+            />
+         </div>
+      </div>
    );
 }
