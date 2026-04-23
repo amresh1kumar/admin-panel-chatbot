@@ -39,7 +39,7 @@ export default function Sidebar() {
    useEffect(() => {
       if (!tenantId) return;
 
-      API.get(`/tenant/${tenantId}`)
+      API.get("/tenant")
          .then(res => {
             const t = res.data;
 

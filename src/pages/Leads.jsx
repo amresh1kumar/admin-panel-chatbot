@@ -21,16 +21,14 @@ export default function Leads() {
    const [searchText, setSearchText] = useState("");
 
    useEffect(() => {
-      if (!tenantId) return;
-
       setLoading(true);
 
-      getLeads(tenantId)
-         .then(res => setLeads(res.data))
+      getLeads()
+         .then(data => setLeads(data || []))
          .catch(err => console.error(err))
          .finally(() => setLoading(false));
 
-   }, [tenantId]);
+   }, []);
 
    // 🔥 Filter leads based on search
    const filteredLeads = leads.filter(lead =>

@@ -1,13 +1,45 @@
 import API from "../api/api";
 
-export const getBotMessages = (tenantId) =>
-   API.get(`/bot-messages/${tenantId}`);
+// ✅ GET ALL MESSAGES
+export const getBotMessages = async () => {
+   try {
+      const res = await API.get("/bot-messages"); // 🔥 no tenantId
+      return res.data;
+   } catch (err) {
+      console.error("Get Bot Messages Error:", err.response?.data || err.message);
+      throw err;
+   }
+};
 
-export const createBotMessage = (data) =>
-   API.post(`/bot-messages`, data);
+// ✅ CREATE MESSAGE
+export const createBotMessage = async (data) => {
+   try {
+      const res = await API.post("/bot-messages", data);
+      return res.data;
+   } catch (err) {
+      console.error("Create Bot Message Error:", err.response?.data || err.message);
+      throw err;
+   }
+};
 
-export const updateBotMessage = (id, data) =>
-   API.put(`/bot-messages/${id}`, data);
+// ✅ UPDATE MESSAGE
+export const updateBotMessage = async (id, data) => {
+   try {
+      const res = await API.put(`/bot-messages/${id}`, data);
+      return res.data;
+   } catch (err) {
+      console.error("Update Bot Message Error:", err.response?.data || err.message);
+      throw err;
+   }
+};
 
-export const deleteBotMessage = (id) =>
-   API.delete(`/bot-messages/${id}`);
+// ✅ DELETE MESSAGE
+export const deleteBotMessage = async (id) => {
+   try {
+      const res = await API.delete(`/bot-messages/${id}`);
+      return res.data;
+   } catch (err) {
+      console.error("Delete Bot Message Error:", err.response?.data || err.message);
+      throw err;
+   }
+};

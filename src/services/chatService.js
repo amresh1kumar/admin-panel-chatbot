@@ -1,14 +1,46 @@
+
+
 import API from "../api/api";
 
-export const getChats = (tenantId, phone) => {
-   return API.get(`/chats/${tenantId}/${phone}`);
+export const getChats = async (phone) => {
+   try {
+      const res = await API.get(`/chats/${phone}`);
+      return res.data;
+   } catch (err) {
+      console.error("Get Chats Error:", err.response?.data || err.message);
+      throw err;
+   }
+};
+
+export const sendChatMessage = async (to, message) => {
+   try {
+      const res = await API.post("/chats/send", {
+         to,
+         message
+      });
+
+      return res.data;
+   } catch (err) {
+      console.error("Send Message Error:", err.response?.data || err.message);
+      throw err;
+   }
+};
+
+export const markAsRead = async (phone) => {
+   try {
+      await API.put(`/chats/read/${phone}`);
+   } catch (err) {
+      console.error("Mark Read Error:", err);
+   }
 };
 
 
-export const sendChatMessage = (tenantId, to, message) => {
-   return API.post("/send-message", {
-      tenantId,
-      to,
-      message
-   });
+export const clearChat = async (phone) => {
+   try {
+      const res = await API.delete(`/chats/clear/${phone}`);
+      return res.data;
+   } catch (err) {
+      console.error("Clear Chat Error:", err.response?.data || err.message);
+      throw err;
+   }
 };

@@ -403,3 +403,14 @@
       max-width: 80%;
    }
 }
+
+
+.message-status {
+   margin-left: 6px;
+   font-size: 12px;
+   color: gray;
+}
+
+.message-status.read {
+   color: #25D366; /* WhatsApp style */
+}
