@@ -44,3 +44,40 @@ export const clearChat = async (phone) => {
       throw err;
    }
 };
+
+
+
+// export const sendTemplateMessage = async (to) => {
+//    try {
+//       const res = await API.post("/chats/template", {
+//          to,
+//          templateName: "hello_world",
+//          languageCode: "en_US"
+//       });
+
+//       return res.data;
+//    } catch (err) {
+//       console.error("Template Error:", err.response?.data || err.message);
+//       throw err;
+//    }
+// };
+
+export const sendTemplateMessage = async (
+   to,
+   templateName,
+   params = []
+) => {
+   try {
+      const res = await API.post("/chats/template", {
+         to,
+         templateName,
+         languageCode: "en_US",
+         params
+      });
+
+      return res.data;
+   } catch (err) {
+      console.error("Template Error:", err.response?.data || err.message);
+      throw err;
+   }
+};

@@ -1,185 +1,8 @@
-
-// import { useEffect, useState, useRef } from "react";
-// import { getChats, sendChatMessage, markAsRead } from "../../services/chatService";
-// import {
-//    UserOutlined,
-//    SendOutlined,
-//    PaperClipOutlined,
-//    SmileOutlined
-// } from "@ant-design/icons";
-// import socket from "../../socket";
-// import "../../styles/ChatWindow.css";
-
-// export default function ChatWindow({ user }) {
-
-//    const [messages, setMessages] = useState([]);
-//    const [input, setInput] = useState("");
-//    const [loading, setLoading] = useState(false);
-
-//    const bottomRef = useRef(null);
-
-//    useEffect(() => {
-//       if (!user) return;
-
-//       // const interval = setInterval(() => {
-//       //    getChats(user).then(setMessages);
-//       // }, 3000);
-
-//       // return () => clearInterval(interval);
-//    }, [user]);
-
-
-//    // 🔥 INITIAL FETCH
-//    useEffect(() => {
-//       if (!user) return;
-
-//       setLoading(true);
-
-//       getChats(user)
-//          .then(data => setMessages(data))
-//          .catch(err => console.error(err))
-//          .finally(() => setLoading(false));
-
-//       // 🔥 ADD THIS
-//       markAsRead(user);
-
-//    }, [user]);
-//    // 🔥 AUTO SCROLL
-//    useEffect(() => {
-//       bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-//    }, [messages]);
-
-//    // 🔥 SEND MESSAGE
-//    const handleSend = async () => {
-//       if (!input.trim()) return;
-
-//       const newMsg = {
-//          _id: Date.now(),
-//          message: input,
-//          type: "bot",
-//          status: "sent",
-//          createdAt: new Date()
-//       };
-
-//       setMessages(prev => [...prev, newMsg]);
-//       setInput("");
-
-//       try {
-//          await sendChatMessage(user, input);
-//       } catch (err) {
-//          console.error("Send Error:", err);
-//       }
-//    };
-
-//    if (!user) {
-//       return (
-//          <div className="chat-empty-state">
-//             <div className="empty-content">
-//                <div className="empty-icon-wrapper">💬</div>
-//                <h3 className="empty-title">WhatsApp Web</h3>
-//                <p className="empty-text">
-//                   Select a chat to start messaging
-//                </p>
-//             </div>
-//          </div>
-//       );
-//    }
-
-//    return (
-//       <div className="chat-window">
-
-//          {/* Header */}
-//          <div className="chat-header">
-//             <div className="chat-header-left">
-//                <div className="chat-avatar">
-//                   <UserOutlined className="avatar-icon" />
-//                </div>
-//                <div className="chat-user-info">
-//                   <h3 className="chat-user-name">{user}</h3>
-//                </div>
-//             </div>
-//          </div>
-
-//          {/* Messages */}
-//          <div className="chat-messages">
-//             {loading && (
-//                <div className="chat-loading">
-//                   <div className="loading-spinner"></div>
-//                   <p>Loading messages...</p>
-//                </div>
-//             )}
-
-//             {!loading && (messages || []).map((msg, index) => (
-//                <div
-//                   key={msg._id}
-//                   className={`message-wrapper ${msg.type === "user" ? "user" : "bot"}`}
-//                >
-//                   <div className={`message-bubble ${msg.type === "user" ? "user" : "bot"}`}>
-//                      <div className="message-text">{msg.message}</div>
-
-//                      <div className="message-meta">
-//                         <span className="message-time">
-//                            {msg.createdAt
-//                               ? new Date(msg.createdAt).toLocaleTimeString([], {
-//                                  hour: "2-digit",
-//                                  minute: "2-digit"
-//                               })
-//                               : "--"}
-//                         </span>
-//                         {msg.type === "bot" && (
-//                            <span className="message-status">
-//                               {msg.status === "sent" && "✓"}
-//                               {msg.status === "delivered" && "✓✓"}
-//                               {msg.status === "read" && "✓✓"}
-//                            </span>
-//                         )}
-//                      </div>
-//                   </div>
-//                </div>
-//             ))}
-
-//             <div ref={bottomRef}></div>
-//          </div>
-
-//          {/* Input */}
-//          <div className="chat-input-area">
-//             <div className="chat-input-wrapper">
-
-//                <button className="input-action-btn">
-//                   <SmileOutlined className="input-icon" />
-//                </button>
-
-//                <button className="input-action-btn">
-//                   <PaperClipOutlined className="input-icon" />
-//                </button>
-
-//                <input
-//                   value={input}
-//                   onChange={e => setInput(e.target.value)}
-//                   placeholder="Type a message"
-//                   onKeyDown={(e) => e.key === "Enter" && handleSend()}
-//                   className="chat-input"
-//                />
-
-//                <button
-//                   onClick={handleSend}
-//                   className="send-btn"
-//                   disabled={!input.trim()}
-//                >
-//                   <SendOutlined className="send-icon" />
-//                </button>
-
-//             </div>
-//          </div>
-
-//       </div>
-//    );
-// }
-
 import { useEffect, useState, useRef } from "react";
-import { Dropdown, Menu, Modal, message, message as antdMessage } from "antd";
+import { Dropdown, Modal, message, Select, Input, Button } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
 import { getChats, sendChatMessage, markAsRead, clearChat } from "../../services/chatService";
+import { getTemplates, sendTemplateMessage,syncTemplates } from "../../services/templateService";
 import {
    UserOutlined,
    SendOutlined,
@@ -194,6 +17,12 @@ export default function ChatWindow({ user }) {
    const [messages, setMessages] = useState([]);
    const [input, setInput] = useState("");
    const [loading, setLoading] = useState(false);
+   const [templates, setTemplates] = useState([]);
+
+   const [isModalOpen, setIsModalOpen] = useState(false);
+   const [selectedTemplate, setSelectedTemplate] = useState(null);
+   const [params, setParams] = useState([]);
+   const [mediaUrl, setMediaUrl] = useState("");
 
    const bottomRef = useRef(null);
 
@@ -281,6 +110,75 @@ export default function ChatWindow({ user }) {
    };
 
 
+
+
+   const openTemplateModal = () => {
+      setIsModalOpen(true);
+   };
+   const handleTemplateChange = (value) => {
+      const template = templates.find(t => t.name === value);
+      setSelectedTemplate(template);
+      setParams(Array(template.params).fill(""));
+   };
+
+   const handleParamChange = (value, index) => {
+      const updated = [...params];
+      updated[index] = value;
+      setParams(updated);
+   };
+
+   const handleSendTemplate = async () => {
+      try {
+         await sendTemplateMessage(user, selectedTemplate.name, params, mediaUrl);
+         setIsModalOpen(false);
+         setSelectedTemplate(null);
+         setParams([]);
+         setMediaUrl("");
+      } catch (err) {
+         console.error(err);
+      }
+   };
+
+   const generatePreview = () => {
+      if (!selectedTemplate) return "";
+
+      let text = selectedTemplate.body || "";
+
+      params.forEach((p, index) => {
+         text = text.replace(`{{${index + 1}}}`, p || `{{${index + 1}}}`);
+      });
+
+      return text;
+   };
+
+
+   useEffect(() => {
+      const fetchTemplates = async () => {
+         try {
+            const data = await getTemplates();
+            setTemplates(data);
+         } catch (err) {
+            console.error(err);
+         }
+      };
+
+      fetchTemplates();
+   }, []);
+
+   const handleSyncTemplates = async () => {
+      try {
+         await syncTemplates();
+         message.success("Templates Synced");
+
+         // 🔥 refresh templates
+         const data = await getTemplates();
+         setTemplates(data);
+
+      } catch (err) {
+         console.error(err);
+         message.error("Sync failed");
+      }
+   };
    if (!user) {
       return (
          <div className="chat-empty-state">
@@ -295,17 +193,6 @@ export default function ChatWindow({ user }) {
       );
    }
 
-   const menu = (
-      <Menu
-         items={[
-            {
-               key: "clear",
-               label: "Clear Chat",
-               onClick: handleClearChat,
-            },
-         ]}
-      />
-   );
 
    return (
       <div className="chat-window">
@@ -330,6 +217,17 @@ export default function ChatWindow({ user }) {
                            label: "Clear Chat",
                            onClick: handleClearChat,
                         },
+
+                        {
+                           key: "template",
+                           label: "Send Template",
+                           onClick: openTemplateModal,
+                        },
+                        {
+                           key: "sync",
+                           label: "Sync Templates",
+                           onClick: handleSyncTemplates,
+                        }
                      ],
                   }}
                   trigger={["click"]}
@@ -413,7 +311,96 @@ export default function ChatWindow({ user }) {
 
             </div>
          </div>
+         <Modal
+            title="Send Template"
+            open={isModalOpen}
+            onCancel={() => setIsModalOpen(false)}
+            footer={null}
+         >
+            <Select
+               placeholder="Select Template"
+               style={{ width: "100%", marginBottom: 10 }}
+               onChange={handleTemplateChange}
+            >
+               {templates.map(t => (
+                  <Select.Option key={t.name} value={t.name}>
+                     {t.label}
+                  </Select.Option>
+               ))}
+            </Select>
 
+            {/* Dynamic Inputs */}
+            {selectedTemplate &&
+               params.map((p, index) => (
+                  <Input
+                     key={index}
+                     placeholder={`Enter value ${index + 1}`}
+                     style={{ marginBottom: 8 }}
+                     value={p}
+                     onChange={(e) => handleParamChange(e.target.value, index)}
+                  />
+               ))}
+
+            {selectedTemplate && (
+               <Input
+                  placeholder="Enter media URL (image/pdf/video)"
+                  value={mediaUrl}
+                  onChange={(e) => setMediaUrl(e.target.value)}
+                  style={{ marginBottom: 10 }}
+               />
+            )}
+            {selectedTemplate && (
+               <div
+                  style={{
+                     background: "#f0f2f5",
+                     padding: "10px",
+                     borderRadius: "8px",
+                     marginBottom: "10px"
+                  }}
+               >
+                  <strong>Preview:</strong>
+                  <div style={{ marginTop: "5px" }}>
+                     {generatePreview()}
+                  </div>
+               </div>
+            )}
+
+            {mediaUrl && (
+               <div style={{ marginBottom: 10 }}>
+                  <strong>Media Preview:</strong>
+
+                  {/* IMAGE */}
+                  {mediaUrl.match(/\.(jpeg|jpg|png|gif)$/i) && (
+                     <img
+                        src={mediaUrl}
+                        alt="preview"
+                        style={{ width: "100%", marginTop: 8 }}
+                     />
+                  )}
+
+                  {/* PDF */}
+                  {mediaUrl.match(/\.pdf$/i) && (
+                     <a href={mediaUrl} target="_blank" rel="noreferrer">
+                        📄 Open PDF
+                     </a>
+                  )}
+
+                  {/* VIDEO */}
+                  {mediaUrl.match(/\.mp4$/i) && (
+                     <video src={mediaUrl} controls style={{ width: "100%" }} />
+                  )}
+               </div>
+            )}
+
+            <Button
+               type="primary"
+               block
+               onClick={handleSendTemplate}
+               disabled={!selectedTemplate}
+            >
+               Send
+            </Button>
+         </Modal>
       </div>
    );
 }
