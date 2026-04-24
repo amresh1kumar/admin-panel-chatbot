@@ -1,6 +1,5 @@
 import API from "../api/api";
 
-// ✅ CREATE TENANT (register flow)
 export const createTenant = async (data) => {
    try {
       const res = await API.post("/tenant", data);
@@ -11,7 +10,6 @@ export const createTenant = async (data) => {
    }
 };
 
-// ✅ CONNECT WHATSAPP (SECURE)
 export const connectWhatsApp = async (data) => {
    try {
       const res = await API.put("/tenant", data); // 🔥 no tenantId

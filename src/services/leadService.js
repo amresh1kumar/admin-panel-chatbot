@@ -1,6 +1,5 @@
 import API from "../api/api";
 
-// ✅ GET LEADS (SECURE)
 export const getLeads = async () => {
    try {
       const res = await API.get("/leads"); // 🔥 no tenantId

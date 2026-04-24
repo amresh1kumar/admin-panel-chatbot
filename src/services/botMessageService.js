@@ -1,6 +1,5 @@
 import API from "../api/api";
 
-// ✅ GET ALL MESSAGES
 export const getBotMessages = async () => {
    try {
       const res = await API.get("/bot-messages"); // 🔥 no tenantId
@@ -11,7 +10,6 @@ export const getBotMessages = async () => {
    }
 };
 
-// ✅ CREATE MESSAGE
 export const createBotMessage = async (data) => {
    try {
       const res = await API.post("/bot-messages", data);
@@ -22,7 +20,6 @@ export const createBotMessage = async (data) => {
    }
 };
 
-// ✅ UPDATE MESSAGE
 export const updateBotMessage = async (id, data) => {
    try {
       const res = await API.put(`/bot-messages/${id}`, data);
@@ -33,7 +30,6 @@ export const updateBotMessage = async (id, data) => {
    }
 };
 
-// ✅ DELETE MESSAGE
 export const deleteBotMessage = async (id) => {
    try {
       const res = await API.delete(`/bot-messages/${id}`);

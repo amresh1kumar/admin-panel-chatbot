@@ -12,7 +12,6 @@ import {
    Empty
 } from "antd";
 import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
-
 import {
    getBotMessages,
    createBotMessage,
@@ -21,19 +20,16 @@ import {
 } from "../services/botMessageService";
 
 export default function BotMessage() {
-
    const [data, setData] = useState([]);
    const [loading, setLoading] = useState(false);
    const [open, setOpen] = useState(false);
    const [editing, setEditing] = useState(null);
-
    const [form] = Form.useForm();
 
-   // ================= FETCH =================
    const fetchData = async () => {
       setLoading(true);
       try {
-         const res = await getBotMessages(); // 🔥 FIXED
+         const res = await getBotMessages();
          setData(res || []);
       } catch (err) {
          console.error(err);
@@ -43,7 +39,7 @@ export default function BotMessage() {
    };
 
    useEffect(() => {
-      fetchData(); // 🔥 tenantId removed
+      fetchData();
    }, []);
 
    // ================= SUBMIT =================
@@ -64,7 +60,7 @@ export default function BotMessage() {
             await updateBotMessage(editing._id, formatted);
             message.success("Updated");
          } else {
-            await createBotMessage(formatted); // 🔥 FIXED (no tenantId)
+            await createBotMessage(formatted);
             message.success("Created");
          }
 

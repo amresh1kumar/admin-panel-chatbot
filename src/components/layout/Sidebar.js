@@ -75,7 +75,6 @@ export default function Sidebar() {
                   {/* EXISTING */}
                   <h2 className="sidebar-title">SP Advertising</h2>
 
-                  {/* 🔥 NEW ADD */}
                   <div className="connection-status">
                      <span
                         className={`status-dot ${connected ? "status-connected" : "status-disconnected"
@@ -215,7 +214,6 @@ export default function Sidebar() {
          {/* Toggle Button */}
          <div className="sidebar-footer">
 
-            {/* 🔥 LOGOUT */}
             <div
                onClick={handleLogout}
                className="menu-item"

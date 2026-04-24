@@ -11,7 +11,7 @@ export default function ConnectAccount() {
 
    const onFinish = async (values) => {
       try {
-         await connectWhatsApp(values); // 🔥 FIXED
+         await connectWhatsApp(values); 
 
          message.success("WhatsApp Connected Successfully!");
 
@@ -27,7 +27,6 @@ export default function ConnectAccount() {
       }
    };
 
-   // ✅ SUCCESS SCREEN
    if (success) {
       return (
          <div className="success-container">

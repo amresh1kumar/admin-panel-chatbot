@@ -13,7 +13,6 @@ import socket from "../../socket";
 import "../../styles/ChatWindow.css";
 
 export default function ChatWindow({ user }) {
-
    const [messages, setMessages] = useState([]);
    const [input, setInput] = useState("");
    const [loading, setLoading] = useState(false);
@@ -26,7 +25,7 @@ export default function ChatWindow({ user }) {
 
    const bottomRef = useRef(null);
 
-   // 🔥 JOIN ROOM (only when user changes)
+   //JOIN ROOM (only when user changes)
    useEffect(() => {
       if (!user) return;
 
@@ -34,7 +33,7 @@ export default function ChatWindow({ user }) {
 
    }, [user]);
 
-   // 🔥 INITIAL FETCH (only once per user)
+   // INITIAL FETCH (only once per user)
    useEffect(() => {
       if (!user) return;
 
@@ -51,7 +50,7 @@ export default function ChatWindow({ user }) {
 
    }, [user]);
 
-   // 🔥 SOCKET LISTENER (REALTIME)
+   //SOCKET LISTENER (REALTIME)
    useEffect(() => {
       const handleMessage = (msg) => {
          console.log("SOCKET RECEIVED:", msg);
@@ -60,7 +59,7 @@ export default function ChatWindow({ user }) {
             const exists = prev.some(m => m._id === msg._id);
             if (exists) return prev;
 
-            return [...prev, { ...msg }]; // 🔥 force re-render
+            return [...prev, { ...msg }]; //force re-render
          });
       };
 
@@ -71,12 +70,12 @@ export default function ChatWindow({ user }) {
       };
    }, []);
 
-   // 🔥 AUTO SCROLL
+   //AUTO SCROLL
    useEffect(() => {
       bottomRef.current?.scrollIntoView({ behavior: "smooth" });
    }, [messages]);
 
-   // 🔥 SEND MESSAGE
+   //SEND MESSAGE
    const handleSend = async () => {
       if (!input.trim()) return;
 
@@ -170,7 +169,7 @@ export default function ChatWindow({ user }) {
          await syncTemplates();
          message.success("Templates Synced");
 
-         // 🔥 refresh templates
+         // refresh templates
          const data = await getTemplates();
          setTemplates(data);
 

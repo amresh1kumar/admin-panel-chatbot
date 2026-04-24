@@ -1,6 +1,5 @@
 import API from "../api/api";
 
-// 🔹 GET TEMPLATES
 export const getTemplates = async () => {
    try {
       const res = await API.get("/templates");
@@ -23,7 +22,7 @@ export const sendTemplateMessage = async (
          templateName,
          languageCode: "en_US",
          params,
-         mediaUrl // 🔥 NEW
+         mediaUrl
       });
 
       return res.data;
@@ -33,7 +32,6 @@ export const sendTemplateMessage = async (
    }
 };
 
-// 🔹 CREATE TEMPLATE (optional admin use)
 export const createTemplate = async (data) => {
    try {
       const res = await API.post("/templates", data);

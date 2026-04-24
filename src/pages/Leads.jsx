@@ -30,14 +30,11 @@ export default function Leads() {
 
    }, []);
 
-   // 🔥 Filter leads based on search
    const filteredLeads = leads.filter(lead =>
       lead.name?.toLowerCase().includes(searchText.toLowerCase()) ||
       lead.phone?.includes(searchText) ||
       lead.business?.toLowerCase().includes(searchText.toLowerCase())
    );
-
-   // 🔥 Table Columns
    const columns = [
       {
          title: "Name",

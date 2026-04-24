@@ -1,17 +1,14 @@
 import API from "../api/api";
 
-// ✅ GET MENUS (SECURE)
 export const getMenus = async () => {
    try {
-      const res = await API.get("/bot-menus"); // 🔥 no tenantId
-      return res.data;
+      const res = await API.get("/bot-menus");
    } catch (err) {
       console.error("Get Menus Error:", err.response?.data || err.message);
       throw err;
    }
 };
 
-// ✅ CREATE MENU (SECURE)
 export const createMenu = async (data) => {
    try {
       const res = await API.post("/bot-menus", data);
@@ -22,7 +19,6 @@ export const createMenu = async (data) => {
    }
 };
 
-// ✅ UPDATE MENU
 export const updateMenu = async (id, data) => {
    try {
       const res = await API.put(`/bot-menus/${id}`, data);
@@ -33,7 +29,6 @@ export const updateMenu = async (id, data) => {
    }
 };
 
-// ✅ DELETE MENU
 export const deleteMenu = async (id) => {
    try {
       const res = await API.delete(`/bot-menus/${id}`);

@@ -1,19 +1,17 @@
 import { Form, Input, Button, Card, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
-import { useAuth } from "../context/AuthContext"; // ✅ Import
-import { useTenant } from "../context/TenantContext"; // ✅ Import
+import { useAuth } from "../context/AuthContext";
+import { useTenant } from "../context/TenantContext";
 
 export default function Login() {
    const navigate = useNavigate();
-   const { login } = useAuth(); // ✅ Use context function
-   const { saveTenant } = useTenant(); // ✅ Use tenant function
+   const { login } = useAuth();
+   const { saveTenant } = useTenant();
 
    const onFinish = async (values) => {
       try {
          const res = await API.post("/auth/login", values);
-
-         // ✅ Context ke login() function use karo
          login(res.data.token);
          saveTenant(res.data.tenantId);
 
@@ -45,10 +43,10 @@ export default function Login() {
                <Form.Item
                   name="password"
                   label="Password"
-                  // rules={[
-                  //    { required: true, message: "Password required" },
-                  //    { min: 6, message: "Minimum 6 characters" }
-                  // ]}
+               // rules={[
+               //    { required: true, message: "Password required" },
+               //    { min: 6, message: "Minimum 6 characters" }
+               // ]}
                >
                   <Input.Password placeholder="Enter password" />
                </Form.Item>
@@ -58,7 +56,6 @@ export default function Login() {
                </Button>
             </Form>
 
-            {/* 🔗 NAVIGATION */}
             <p style={{ textAlign: "center", marginTop: "15px" }}>
                Don't have an account?{" "}
                <span
