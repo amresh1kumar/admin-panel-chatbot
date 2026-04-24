@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import {
    Table,
@@ -12,6 +13,7 @@ import {
    Empty
 } from "antd";
 import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+
 import {
    getMenus,
    createMenu,
@@ -25,12 +27,14 @@ export default function BotMenu() {
    const [loading, setLoading] = useState(false);
    const [open, setOpen] = useState(false);
    const [editing, setEditing] = useState(null);
+
    const [form] = Form.useForm();
 
+   // ================= FETCH =================
    const fetchData = async () => {
       setLoading(true);
       try {
-         const res = await getMenus();
+         const res = await getMenus(); // 🔥 FIXED
          setData(res || []);
       } catch {
          message.error("Failed to load menus");
@@ -42,6 +46,7 @@ export default function BotMenu() {
       fetchData();
    }, []);
 
+   // ================= SUBMIT =================
    const onFinish = async (values) => {
       try {
          const formatted = {
