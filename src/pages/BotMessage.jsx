@@ -327,7 +327,7 @@ export default function BotMessage() {
                <Form.Item
                   name="reply"
                   label="Reply Message"
-                  rules={[{ required: true }]}
+                  rules={[{ required: false }]}
                >
                   <Input.TextArea rows={4} />
                </Form.Item>
