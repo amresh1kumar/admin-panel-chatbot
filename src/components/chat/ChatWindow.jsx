@@ -9,7 +9,7 @@ import {
    PaperClipOutlined,
    SmileOutlined
 } from "@ant-design/icons";
-import socket from "../../socket";
+// import socket from "../../socket";
 import "../../styles/ChatWindow.css";
 
 export default function ChatWindow({ user }) {
@@ -26,12 +26,12 @@ export default function ChatWindow({ user }) {
    const bottomRef = useRef(null);
 
    //JOIN ROOM (only when user changes)
-   useEffect(() => {
-      if (!user) return;
+   // useEffect(() => {
+   //    if (!user) return;
 
-      socket.emit("join", String(user));
+   //    socket.emit("join", String(user));
 
-   }, [user]);
+   // }, [user]);
 
    // INITIAL FETCH (only once per user)
    useEffect(() => {
@@ -51,24 +51,24 @@ export default function ChatWindow({ user }) {
    }, [user]);
 
    //SOCKET LISTENER (REALTIME)
-   useEffect(() => {
-      const handleMessage = (msg) => {
-         console.log("SOCKET RECEIVED:", msg);
+   // useEffect(() => {
+   //    const handleMessage = (msg) => {
+   //       console.log("SOCKET RECEIVED:", msg);
 
-         setMessages(prev => {
-            const exists = prev.some(m => m._id === msg._id);
-            if (exists) return prev;
+   //       setMessages(prev => {
+   //          const exists = prev.some(m => m._id === msg._id);
+   //          if (exists) return prev;
 
-            return [...prev, { ...msg }]; //force re-render
-         });
-      };
+   //          return [...prev, { ...msg }]; //force re-render
+   //       });
+   //    };
 
-      socket.on("newMessage", handleMessage);
+   //    socket.on("newMessage", handleMessage);
 
-      return () => {
-         socket.off("newMessage", handleMessage);
-      };
-   }, []);
+   //    return () => {
+   //       socket.off("newMessage", handleMessage);
+   //    };
+   // }, []);
 
    //AUTO SCROLL
    useEffect(() => {

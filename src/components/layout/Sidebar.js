@@ -209,6 +209,15 @@ export default function Sidebar() {
                   {!collapsed && <span className="menu-text">Webchat</span>}
                </div>
             </div> */}
+
+            <div
+               onClick={() => navigate("/profile")}
+               className={`menu-item ${isActive("/profile") ? "active" : ""}`}
+               title={collapsed ? "Profile" : ""}
+            >
+               <UserAddOutlined className="menu-icon" />
+               {!collapsed && <span className="menu-text">Profile</span>}
+            </div>
          </div>
 
          {/* Toggle Button */}

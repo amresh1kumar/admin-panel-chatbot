@@ -10,6 +10,7 @@ import BotMessage from "./pages/BotMessage";
 import BotMenu from "./pages/BotMenu";
 
 import { useAuth } from "./context/AuthContext";
+import Profile from "./pages/Profile";
 
 function App() {
   const { token } = useAuth();
@@ -30,6 +31,7 @@ function App() {
           <Route path="/create-account" element={<ConnectAccount />} />
           <Route path="/bot-messages" element={<BotMessage />} />
           <Route path="/bot-menus" element={<BotMenu/>} />
+          <Route path="/profile" element={<Profile/>} />
           
         </Route>
 
