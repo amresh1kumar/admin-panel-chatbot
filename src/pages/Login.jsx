@@ -43,10 +43,10 @@ export default function Login() {
                <Form.Item
                   name="password"
                   label="Password"
-               // rules={[
-               //    { required: true, message: "Password required" },
-               //    { min: 6, message: "Minimum 6 characters" }
-               // ]}
+               rules={[
+                  { required: true, message: "Password required" },
+                  { min: 6, message: "Minimum 6 characters" }
+               ]}
                >
                   <Input.Password placeholder="Enter password" />
                </Form.Item>
