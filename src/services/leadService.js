@@ -9,3 +9,8 @@ export const getLeads = async () => {
       throw err;
    }
 };
+
+export const deleteLead = async (id) => {
+   const res = await API.delete(`/leads/${id}`);
+   return res.data;
+};

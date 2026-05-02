@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import Layout from "../components/layout/Layout";
 import { useTenant } from "../context/TenantContext";
-import { getLeads } from "../services/leadService";
-import { Table, Tag, Input, Button, Space } from "antd";
+import { getLeads, deleteLead } from "../services/leadService";
+import { Table, Tag, Input, Button, Space, Popconfirm } from "antd";
 import {
    SearchOutlined,
    PhoneOutlined,
@@ -35,6 +35,20 @@ export default function Leads() {
       lead.phone?.includes(searchText) ||
       lead.business?.toLowerCase().includes(searchText.toLowerCase())
    );
+
+
+   const handleDelete = async (id) => {
+      try {
+         await deleteLead(id);
+
+         // 🔥 UI update
+         setLeads(prev => prev.filter(l => l._id !== id));
+
+      } catch (err) {
+         console.error(err);
+      }
+   };
+
    const columns = [
       {
          title: "Name",
@@ -68,14 +82,23 @@ export default function Leads() {
             </div>
          ),
       },
+
       {
-         title: "Business",
-         dataIndex: "business",
-         key: "business",
+         title: "Form Contact",
+         dataIndex: "userPhone",
+         key: "userPhone",
          render: (text) => (
             <span className="business-text">{text || "N/A"}</span>
          ),
       },
+      // {
+      //    title: "Business",
+      //    dataIndex: "business",
+      //    key: "business",
+      //    render: (text) => (
+      //       <span className="business-text">{text || "N/A"}</span>
+      //    ),
+      // },
       {
          title: "Requirement",
          dataIndex: "requirement",
@@ -103,6 +126,21 @@ export default function Leads() {
             </div>
          ),
       },
+      {
+         title: "Action",
+         key: "action",
+         render: (_, record) => (
+            <Space>
+               <Popconfirm
+                  title="Are you sure delete this lead?"
+                  onConfirm={() => handleDelete(record._id)}
+               >
+                  <Button danger size="small">Delete</Button>
+               </Popconfirm>
+
+            </Space>
+         ),
+      }
    ];
 
    return (
