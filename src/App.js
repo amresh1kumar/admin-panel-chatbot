@@ -12,30 +12,31 @@ import BotMenu from "./pages/BotMenu";
 import { useAuth } from "./context/AuthContext";
 import Profile from "./pages/Profile";
 
+
+import ProtectedRoute from "./components/ProtectedRoute";
+
 function App() {
   const { token } = useAuth();
 
   return (
     <BrowserRouter>
       <Routes>
-
+        {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        <Route
-          element={token ? <Layout /> : <Navigate to="/login" />}
-        >
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/chat" element={<ChatPage />} />
-          <Route path="/leads" element={<Leads />} />
-          <Route path="/create-account" element={<ConnectAccount />} />
-          <Route path="/bot-messages" element={<BotMessage />} />
-          <Route path="/bot-menus" element={<BotMenu/>} />
-          <Route path="/profile" element={<Profile/>} />
-          
+        <Route element={<ProtectedRoute />}>
+          <Route element={<Layout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/chat" element={<ChatPage />} />
+            <Route path="/leads" element={<Leads />} />
+            <Route path="/create-account" element={<ConnectAccount />} />
+            <Route path="/bot-messages" element={<BotMessage />} />
+            <Route path="/bot-menus" element={<BotMenu />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
         </Route>
 
-        {/* Default */}
         <Route
           path="*"
           element={<Navigate to={token ? "/dashboard" : "/login"} />}
@@ -45,5 +46,38 @@ function App() {
     </BrowserRouter>
   );
 }
+// function App() {
+//   const { token } = useAuth();
+
+//   return (
+//     <BrowserRouter>
+//       <Routes>
+
+//         <Route path="/login" element={<Login />} />
+//         <Route path="/register" element={<Register />} />
+
+//         <Route
+//           element={token ? <Layout /> : <Navigate to="/login" />}
+//         >
+//           <Route path="/dashboard" element={<Dashboard />} />
+//           <Route path="/chat" element={<ChatPage />} />
+//           <Route path="/leads" element={<Leads />} />
+//           <Route path="/create-account" element={<ConnectAccount />} />
+//           <Route path="/bot-messages" element={<BotMessage />} />
+//           <Route path="/bot-menus" element={<BotMenu/>} />
+//           <Route path="/profile" element={<Profile/>} />
+
+//         </Route>
+
+//         {/* Default */}
+//         <Route
+//           path="*"
+//           element={<Navigate to={token ? "/dashboard" : "/login"} />}
+//         />
+
+//       </Routes>
+//     </BrowserRouter>
+//   );
+// }
 
 export default App;
