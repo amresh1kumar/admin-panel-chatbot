@@ -284,13 +284,13 @@ export default function ChatWindow({ user }) {
          <div className="chat-input-area">
             <div className="chat-input-wrapper">
 
-               <button className="input-action-btn">
+               {/* <button className="input-action-btn">
                   <SmileOutlined className="input-icon" />
                </button>
 
                <button className="input-action-btn">
                   <PaperClipOutlined className="input-icon" />
-               </button>
+               </button> */}
 
                <input
                   value={input}
