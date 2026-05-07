@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import Layout from "../components/layout/Layout";
 import { useTenant } from "../context/TenantContext";
-import { getLeads, deleteLead, updateLeadStatus, addLeadNote } from "../services/leadService";
-import { Table, Tag, Button, Space, Popconfirm, Select, Modal, Input } from "antd";
+import { getLeads, deleteLead } from "../services/leadService";
+import { Table, Tag, Input, Button, Space, Popconfirm } from "antd";
 import {
    SearchOutlined,
    PhoneOutlined,
@@ -10,26 +10,15 @@ import {
    CalendarOutlined,
    FilterOutlined,
    DownloadOutlined,
-   PlusOutlined,
-   EyeOutlined
+   PlusOutlined
 } from "@ant-design/icons";
 import "../styles/Leads.css";
-import { message as antdMessage } from "antd";
-import { sendBulkMessage } from "../services/leadService";
 
 export default function Leads() {
    const { tenantId } = useTenant();
    const [leads, setLeads] = useState([]);
    const [loading, setLoading] = useState(false);
    const [searchText, setSearchText] = useState("");
-   const [noteModalVisible, setNoteModalVisible] = useState(false);
-   const [selectedLeadId, setSelectedLeadId] = useState(null);
-   const [noteText, setNoteText] = useState("");
-   const [viewNoteModal, setViewNoteModal] = useState(false);
-   const [selectedNotes, setSelectedNotes] = useState([]);
-   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-   const [bulkModalVisible, setBulkModalVisible] = useState(false);
-   const [bulkText, setBulkText] = useState("");
 
    useEffect(() => {
       setLoading(true);
@@ -60,67 +49,6 @@ export default function Leads() {
       }
    };
 
-
-   const handleStatusChange = async (id, value) => {
-      try {
-         await updateLeadStatus(id, value);
-
-         setLeads(prev =>
-            prev.map(l =>
-               l._id === id ? { ...l, status: value } : l
-            )
-         );
-
-      } catch (err) {
-         console.error(err);
-      }
-   };
-
-   const openNoteModal = (id) => {
-      setSelectedLeadId(id);
-      setNoteModalVisible(true);
-   };
-
-   const handleSaveNote = async () => {
-      if (!noteText) return;
-
-      try {
-         await addLeadNote(selectedLeadId, noteText);
-
-         setNoteModalVisible(false);
-         setNoteText("");
-
-      } catch (err) {
-         console.error(err);
-      }
-   };
-
-   const handleViewNotes = (notes) => {
-      setSelectedNotes(notes || []);
-      setViewNoteModal(true);
-   };
-
-
-   const handleBulkSend = async () => {
-      if (!bulkText) return;
-
-      try {
-         const res = await sendBulkMessage({
-            ids: selectedRowKeys,
-            message: bulkText
-         });
-
-         antdMessage.success(`Sent to ${res.sent} users`);
-
-         setBulkModalVisible(false);
-         setBulkText("");
-         setSelectedRowKeys([]);
-
-      } catch (err) {
-         console.error(err);
-         antdMessage.error("Failed to send bulk message");
-      }
-   };
    const columns = [
       {
          title: "Name",
@@ -171,36 +99,16 @@ export default function Leads() {
       //       <span className="business-text">{text || "N/A"}</span>
       //    ),
       // },
-      // {
-      //    title: "Requirement",
-      //    dataIndex: "requirement",
-      //    key: "requirement",
-      //    render: (text) => (
-      //       <Tag color="blue" className="requirement-tag">
-      //          {text || "N/A"}
-      //       </Tag>
-      //    ),
-      // },
-
       {
-         title: "Status",
-         dataIndex: "status",
-         key: "status",
-         render: (status, record) => (
-            <Select
-               value={status || "new"}
-               size="small"
-               style={{ width: 120 }}
-               onChange={(value) => handleStatusChange(record._id, value)}
-               options={[
-                  { value: "new", label: "New" },
-                  { value: "contacted", label: "Contacted" },
-                  { value: "closed", label: "Closed" }
-               ]}
-            />
-         )
+         title: "Requirement",
+         dataIndex: "requirement",
+         key: "requirement",
+         render: (text) => (
+            <Tag color="blue" className="requirement-tag">
+               {text || "N/A"}
+            </Tag>
+         ),
       },
-
       {
          title: "Date",
          dataIndex: "createdAt",
@@ -219,31 +127,17 @@ export default function Leads() {
          ),
       },
       {
-         title: "Notes",
-         key: "notes",
-         render: (_, record) => (
-            <Button
-               icon={<EyeOutlined />}
-               size="small"
-               onClick={() => handleViewNotes(record.notes)}
-            />
-         )
-      },
-      {
          title: "Action",
          key: "action",
          render: (_, record) => (
             <Space>
-               <Button size="small" onClick={() => openNoteModal(record._id)}>
-                  Add Note
-               </Button>
-
                <Popconfirm
                   title="Are you sure delete this lead?"
                   onConfirm={() => handleDelete(record._id)}
                >
                   <Button danger size="small">Delete</Button>
                </Popconfirm>
+
             </Space>
          ),
       }
@@ -301,13 +195,12 @@ export default function Leads() {
                className="search-input"
                allowClear
             />
-            <Button
-               type="primary"
-               disabled={selectedRowKeys.length === 0}
-               onClick={() => setBulkModalVisible(true)}
-            >
-               Send Bulk Message
-            </Button>
+            {/* <Button
+                  icon={<FilterOutlined />}
+                  className="filter-btn"
+               >
+                  Filters
+               </Button> */}
          </div>
 
          {/* Table */}
@@ -325,61 +218,8 @@ export default function Leads() {
                }}
                size="small"
                className="leads-table"
-               rowSelection={{
-                  selectedRowKeys,
-                  onChange: (keys) => setSelectedRowKeys(keys)
-               }}
             />
          </div>
-
-         <Modal
-            title="Add Note"
-            open={noteModalVisible}
-            onOk={handleSaveNote}
-            onCancel={() => {
-               setNoteModalVisible(false);
-               setNoteText("");
-            }}
-         >
-            <Input.TextArea
-               rows={4}
-               placeholder="Enter note..."
-               value={noteText}
-               onChange={(e) => setNoteText(e.target.value)}
-            />
-         </Modal>
-         <Modal
-            title="Notes"
-            open={viewNoteModal}
-            onCancel={() => setViewNoteModal(false)}
-            footer={null}
-         >
-            {selectedNotes.length > 0 ? (
-               selectedNotes.map((note, index) => (
-                  <div key={index} style={{ marginBottom: 10 }}>
-                     <div style={{ fontSize: 12, color: "#888" }}>
-                        {new Date(note.createdAt).toLocaleString()}
-                     </div>
-                     <div>{note.text}</div>
-                  </div>
-               ))
-            ) : (
-               <div style={{ color: "#999" }}>No notes available</div>
-            )}
-         </Modal>
-         <Modal
-            title="Send Bulk Message"
-            open={bulkModalVisible}
-            onOk={handleBulkSend}
-            onCancel={() => setBulkModalVisible(false)}
-         >
-            <Input.TextArea
-               rows={4}
-               placeholder="Enter message..."
-               value={bulkText}
-               onChange={(e) => setBulkText(e.target.value)}
-            />
-         </Modal>
       </div>
    );
 }

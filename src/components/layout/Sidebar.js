@@ -358,6 +358,12 @@ export default function Sidebar() {
                icon: <RobotOutlined />,
                label: 'Bot Menus',
                onClick: () => navigate('/bot-menus')
+            },
+            {
+               key: '/broadcast',
+               icon: <RobotOutlined />,
+               label: 'Broadcast',
+               onClick: () => navigate('/broadcast')
             }
          ]
       },

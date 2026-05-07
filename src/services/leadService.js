@@ -40,7 +40,6 @@ export const updateLeadStatus = async (id, status) => {
    }
 };
 
-// 🔹 ADD NOTE
 export const addLeadNote = async (id, text) => {
    try {
       const res = await API.post(`/leads/${id}/note`, { text });
@@ -51,39 +50,3 @@ export const addLeadNote = async (id, text) => {
    }
 };
 
-
-export const sendBulkMessage = async ({ ids, message }) => {
-   try {
-      const res = await API.post("/bulk-message", {
-         ids,
-         message
-      });
-
-      return res.data;
-
-   } catch (err) {
-      console.error(
-         "Bulk Message Error:",
-         err.response?.data || err.message
-      );
-      throw err;
-   }
-};
-
-
-export const getBroadcastHistory = async () => {
-   try {
-
-      const res = await API.get("/history");
-
-      return res.data;
-
-   } catch (err) {
-      console.error(
-         "Broadcast History Error:",
-         err.response?.data || err.message
-      );
-
-      throw err;
-   }
-};

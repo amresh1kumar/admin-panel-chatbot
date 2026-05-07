@@ -345,3 +345,59 @@
       width: 100%;
    }
 }
+
+.broadcast-history {
+   margin-bottom: 24px;
+}
+
+.broadcast-title {
+   font-size: 20px;
+   font-weight: 600;
+   margin-bottom: 16px;
+   color: #1f2937;
+}
+
+.broadcast-list {
+   display: grid;
+   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+   gap: 16px;
+}
+
+.broadcast-card {
+   background: #fff;
+   border-radius: 12px;
+   padding: 16px;
+   border: 1px solid #e5e7eb;
+   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+   transition: 0.2s ease;
+}
+
+.broadcast-card:hover {
+   transform: translateY(-2px);
+   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.broadcast-message {
+   font-size: 14px;
+   font-weight: 500;
+   color: #111827;
+   margin-bottom: 12px;
+
+   display: -webkit-box;
+   -webkit-line-clamp: 3;
+   -webkit-box-orient: vertical;
+   overflow: hidden;
+}
+
+.broadcast-stats {
+   display: flex;
+   justify-content: space-between;
+   font-size: 13px;
+   color: #4b5563;
+   margin-bottom: 10px;
+}
+
+.broadcast-date {
+   font-size: 12px;
+   color: #9ca3af;
+}

@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import Broadcast from "./pages/Broadcast";
 
 function App() {
   const { token } = useAuth();
@@ -34,6 +35,7 @@ function App() {
             <Route path="/bot-messages" element={<BotMessage />} />
             <Route path="/bot-menus" element={<BotMenu />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/broadcast" element={<Broadcast />} />
           </Route>
         </Route>
 
