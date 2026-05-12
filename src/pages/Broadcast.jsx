@@ -135,7 +135,7 @@ export default function Broadcast() {
          dataIndex: "createdAt",
          key: "createdAt",
          render: (date) =>
-            new Date(date).toLocaleDateString()
+            new Date(date).toLocaleDateString("en-GB")
       },
 
       {

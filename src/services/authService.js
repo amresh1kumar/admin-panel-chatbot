@@ -32,3 +32,26 @@ export const updateUser = async (data) => {
       throw err;
    }
 };
+
+export const deleteAccount = async () => {
+
+   try {
+
+      const res =
+         await API.delete(
+            "/auth/delete-account"
+         );
+
+      return res.data;
+
+   } catch (err) {
+
+      console.error(
+         "Delete Account Error:",
+         err.response?.data ||
+         err.message
+      );
+
+      throw err;
+   }
+};

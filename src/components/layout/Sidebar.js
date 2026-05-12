@@ -327,7 +327,7 @@ export default function Sidebar() {
       {
          key: '/chat',
          icon: <MessageOutlined />,
-         label: 'Shared Inbox',
+         label: 'Inbox',
          onClick: () => navigate('/chat')
       },
       {
@@ -344,7 +344,7 @@ export default function Sidebar() {
             {
                key: '/create-account',
                icon: <LinkOutlined />,
-               label: 'Connect Account',
+               label: 'Link WhatsApp',
                onClick: () => navigate('/create-account')
             },
             {
