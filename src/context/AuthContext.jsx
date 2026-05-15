@@ -7,9 +7,24 @@ export const AuthProvider = ({ children }) => {
       localStorage.getItem("token") || null
    );
 
-   const login = (token) => {
-      localStorage.setItem("token", token);
-      setToken(token);
+   // const login = (token) => {
+   //    localStorage.setItem("token", token);
+   //    setToken(token);
+   // };
+
+   const login = (data) => {
+
+      localStorage.setItem(
+         "token",
+         data.token
+      );
+
+      localStorage.setItem(
+         "user",
+         JSON.stringify(data)
+      );
+
+      setToken(data.token);
    };
 
    const logout = () => {

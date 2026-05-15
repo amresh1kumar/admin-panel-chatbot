@@ -520,7 +520,7 @@ export default function Profile() {
                         color: "red",
                         fontWeight:
                            "bold"
-                     }}
+                     }}fs
                   >
                      Trial expired.
                      Upgrade required.

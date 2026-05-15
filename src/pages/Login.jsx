@@ -12,7 +12,7 @@ export default function Login() {
    const onFinish = async (values) => {
       try {
          const res = await API.post("/auth/login", values);
-         login(res.data.token);
+         login(res.data);
          saveTenant(res.data.tenantId);
 
          message.success("Login Successful");
@@ -43,10 +43,10 @@ export default function Login() {
                <Form.Item
                   name="password"
                   label="Password"
-               rules={[
-                  { required: true, message: "Password required" },
-                  { min: 6, message: "Minimum 6 characters" }
-               ]}
+                  rules={[
+                     { required: true, message: "Password required" },
+                     { min: 6, message: "Minimum 6 characters" }
+                  ]}
                >
                   <Input.Password placeholder="Enter password" />
                </Form.Item>
