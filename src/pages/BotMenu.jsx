@@ -29,7 +29,6 @@ export default function BotMenu() {
 
    const [form] = Form.useForm();
 
-   // ================= FETCH =================
    const fetchData = async () => {
       setLoading(true);
       try {
@@ -45,7 +44,6 @@ export default function BotMenu() {
       fetchData();
    }, []);
 
-   // ================= SUBMIT =================
    const onFinish = async (values) => {
       try {
          const formatted = {
@@ -68,7 +66,8 @@ export default function BotMenu() {
 
                   return {
                      id: parts[0].trim().toLowerCase(),
-                     title: parts[1].trim()
+                     title: parts[1].trim(),
+                     description: parts[2]?.trim() || ""
                   };
                })
          };
@@ -91,7 +90,6 @@ export default function BotMenu() {
       }
    };
 
-   // ================= EDIT =================
    const handleEdit = (record) => {
       setEditing(record);
       setOpen(true);
@@ -100,12 +98,11 @@ export default function BotMenu() {
          ...record,
          trigger: record.trigger?.join(","),
          options: record.options
-            ?.map(o => `${o.id},${o.title}`)
+            ?.map(o => `${o.id},${o.title},${o.description || ""}`)
             .join("\n")
       });
    };
 
-   // ================= DELETE =================
    const handleDelete = async (id) => {
       try {
          await deleteMenu(id);
@@ -116,7 +113,6 @@ export default function BotMenu() {
       }
    };
 
-   // ================= TABLE =================
    const columns = [
       {
          title: "Menu Name",
@@ -137,6 +133,14 @@ export default function BotMenu() {
          dataIndex: "body",
          key: "body",
          width: 300,
+         ellipsis: true
+      },
+
+      {
+         title: "Footer",
+         dataIndex: "footer",
+         key: "footer",
+         width: 200,
          ellipsis: true
       },
       {
@@ -256,6 +260,16 @@ export default function BotMenu() {
                </Form.Item>
 
                <Form.Item
+                  name="footer"
+                  label="Footer Text"
+               >
+                  <Input
+                     maxLength={60}
+                     placeholder="Powered by Your Company"
+                  />
+               </Form.Item>
+
+               <Form.Item
                   name="button"
                   label="Button Text"
                   rules={[{ required: true }]}
@@ -265,7 +279,7 @@ export default function BotMenu() {
 
                <Form.Item
                   name="options"
-                  label="Options (id,title)"
+                  label="Options (id,title,description)"
                   rules={[{ required: true }]}
                >
                   <Input.TextArea rows={5} />

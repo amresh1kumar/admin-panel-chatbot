@@ -31,6 +31,7 @@ import {
 import API from "../../api/api";
 import { useTenant } from "../../context/TenantContext";
 import { useAuth } from "../../context/AuthContext";
+import "../../styles/Sidebar.css"
 
 const { Title } = Typography;
 
@@ -143,7 +144,7 @@ export default function Sidebar() {
             {
                key: 'admin',
                icon: <ApiOutlined />,
-               label: 'Admin',
+               label: 'Super Admin',
                children: [
                   {
                      key: '/admin',
@@ -236,7 +237,12 @@ export default function Sidebar() {
          </div>
 
          {/* Menu */}
-         <div style={{ flex: 1, overflow: 'hidden' }}>
+         <div
+            className="sidebar-scroll"
+            style={{
+               flex: 1, overflowY: 'auto',
+               overflowX: 'hidden'
+            }}>
             <Menu
                theme="dark"
                mode="inline"

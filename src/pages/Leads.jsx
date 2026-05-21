@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Layout from "../components/layout/Layout";
 import { useTenant } from "../context/TenantContext";
 import { getLeads, deleteLead } from "../services/leadService";
-import { Table, Tag, Input, Button, Space, Popconfirm } from "antd";
+import { Table, Tag, Input, Button, Space, Popconfirm, Modal, Descriptions } from "antd";
 import {
    SearchOutlined,
    PhoneOutlined,
@@ -19,6 +19,8 @@ export default function Leads() {
    const [leads, setLeads] = useState([]);
    const [loading, setLoading] = useState(false);
    const [searchText, setSearchText] = useState("");
+   const [detailsOpen, setDetailsOpen] = useState(false);
+   const [selectedLead, setSelectedLead] = useState(null);
 
    useEffect(() => {
       setLoading(true);
@@ -131,12 +133,24 @@ export default function Leads() {
          key: "action",
          render: (_, record) => (
             <Space>
+
+               <Button
+                  size="small"
+                  type="primary"
+                  onClick={() => {
+                     setSelectedLead(record);
+                     setDetailsOpen(true);
+                  }}
+               >
+                  Details
+               </Button>
                <Popconfirm
                   title="Are you sure delete this lead?"
                   onConfirm={() => handleDelete(record._id)}
                >
                   <Button danger size="small">Delete</Button>
                </Popconfirm>
+
 
             </Space>
          ),
@@ -220,6 +234,64 @@ export default function Leads() {
                className="leads-table"
             />
          </div>
+
+         <Modal
+            open={detailsOpen}
+            footer={null}
+            onCancel={() => setDetailsOpen(false)}
+            title="Lead Details"
+            width={700}
+         >
+
+            {selectedLead && (
+
+               <Descriptions
+                  bordered
+                  column={1}
+                  size="small"
+               >
+
+                  <Descriptions.Item label="WhatsApp Number">
+                     {selectedLead.phone || "N/A"}
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Form Contact">
+                     {selectedLead.userPhone || "N/A"}
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Name">
+                     {selectedLead.name || "N/A"}
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Business">
+                     {selectedLead.business || "N/A"}
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Requirement">
+                     {selectedLead.requirement || "N/A"}
+                  </Descriptions.Item>
+
+                  {selectedLead.extraData &&
+                     Object.entries(selectedLead.extraData).map(([key, value]) => (
+
+                        <Descriptions.Item
+                           key={key}
+                           label={key
+                              .replace(/([A-Z])/g, " $1")
+                              .replace(/^./, str => str.toUpperCase())
+                           }
+                        >
+                           {String(value)}
+                        </Descriptions.Item>
+
+                     ))
+                  }
+
+               </Descriptions>
+
+            )}
+
+         </Modal>
       </div>
    );
 }

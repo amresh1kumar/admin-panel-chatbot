@@ -50,43 +50,44 @@ function App() {
             <Route path="/bot-menus" element={<BotMenu />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/broadcast" element={<Broadcast />} />
+            <Route
+              element={
+                <AdminProtectedRoute />
+              }
+            >
+
+              <Route
+                path="/admin"
+                element={
+                  <AdminDashboard />
+                }
+              />
+
+              <Route
+                path="/admin/users"
+                element={
+                  <AdminUsers />
+                }
+              />
+
+              <Route
+                path="/admin/tenants"
+                element={
+                  <AdminTenants />
+                }
+              />
+
+              <Route
+                path="/admin/subscriptions"
+                element={
+                  <AdminSubscriptions />
+                }
+              />
+
+            </Route>
           </Route>
         </Route>
-        <Route
-          element={
-            <AdminProtectedRoute />
-          }
-        >
 
-          <Route
-            path="/admin"
-            element={
-              <AdminDashboard />
-            }
-          />
-
-          <Route
-            path="/admin/users"
-            element={
-              <AdminUsers />
-            }
-          />
-
-          <Route
-            path="/admin/tenants"
-            element={
-              <AdminTenants />
-            }
-          />
-
-          <Route
-            path="/admin/subscriptions"
-            element={
-              <AdminSubscriptions />
-            }
-          />
-
-        </Route>
 
         <Route
           path="*"

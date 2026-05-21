@@ -124,4 +124,82 @@ export const getStats =
 
          throw err;
       }
+   };
+
+
+export const getSubscriptions =
+   async () => {
+
+      try {
+
+         const res =
+            await API.get(
+               "/admin/subscriptions"
+            );
+
+         return res.data;
+
+      } catch (err) {
+
+         console.error(
+            "Subscription Error:",
+            err.response?.data ||
+            err.message
+         );
+
+         throw err;
+      }
+   };
+
+
+export const getAllTenants =
+   async (
+      search = ""
+   ) => {
+
+      try {
+
+         const res =
+            await API.get(
+               `/admin/tenants?search=${search}`
+            );
+
+         return res.data;
+
+      } catch (err) {
+
+         console.error(
+            "Tenant Error:",
+            err.response?.data ||
+            err.message
+         );
+
+         throw err;
+      }
+   };
+
+
+
+export const getRecentUsers =
+   async () => {
+
+      try {
+
+         const res =
+            await API.get(
+               "/admin/recent-users"
+            );
+
+         return res.data;
+
+      } catch (err) {
+
+         console.error(
+            "Recent Users Error:",
+            err.response?.data ||
+            err.message
+         );
+
+         throw err;
+      }
    };   
