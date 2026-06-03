@@ -138,6 +138,20 @@ export default function Sidebar() {
          label: 'Profile',
          onClick: () => navigate('/profile')
       },
+      {
+         key: 'settings',
+         icon: <ApiOutlined />,
+         label: 'Settings',
+         children: [
+            {
+               key: '/followup-settings',
+               icon: <CommentOutlined />,
+               label: 'Follow-Up Settings',
+               onClick: () =>
+                  navigate('/followup-settings')
+            }
+         ]
+      },
 
       ...(isSuperAdmin
          ? [

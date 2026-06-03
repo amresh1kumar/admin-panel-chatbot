@@ -30,6 +30,7 @@ import AdminTenants
 
 import AdminSubscriptions
   from "./pages/Admin/AdminSubscriptions";
+import FollowUpSettings from "./pages/FollowUpSettings";
 function App() {
   const { token } = useAuth();
 
@@ -49,6 +50,7 @@ function App() {
             <Route path="/bot-messages" element={<BotMessage />} />
             <Route path="/bot-menus" element={<BotMenu />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/followup-settings"element={<FollowUpSettings />}/>
             <Route path="/broadcast" element={<Broadcast />} />
             <Route
               element={
