@@ -262,7 +262,7 @@ export default function Leads() {
                   Details
                </Button>
 
-               <Button
+               {/* <Button
                   size="small"
                   onClick={() => {
                      setSelectedLead(record);
@@ -270,7 +270,7 @@ export default function Leads() {
                   }}
                >
                   Follow Up
-               </Button>
+               </Button> */}
 
                <Popconfirm
                   title="Are you sure delete this lead?"
@@ -325,7 +325,7 @@ export default function Leads() {
                <div className="stat-label">This Week</div>
             </div>
 
-            <div className="stat-card">
+            {/* <div className="stat-card">
                <div className="stat-value">
                   {stats.today}
                </div>
@@ -350,7 +350,7 @@ export default function Leads() {
                <div className="stat-label">
                   Completed Follow-Ups
                </div>
-            </div>
+            </div> */}
          </div>
 
          <div className="leads-filters">
@@ -437,7 +437,7 @@ export default function Leads() {
                </Descriptions>
             )}
 
-            <div style={{ marginTop: 20 }}>
+            {/* <div style={{ marginTop: 20 }}>
                <h3>Follow Ups</h3>
 
                {followUps.length === 0 ? (
@@ -521,10 +521,10 @@ export default function Leads() {
                      </div>
                   ))
                )}
-            </div>
+            </div> */}
          </Modal>
 
-         <Modal
+         {/* <Modal
             open={followUpOpen}
             title="Add Follow Up"
             onCancel={() => {
@@ -571,9 +571,9 @@ export default function Leads() {
                   <DatePicker style={{ width: "100%" }} />
                </Form.Item>
             </Form>
-         </Modal>
+         </Modal> */}
 
-         <Modal
+         {/* <Modal
             open={rescheduleOpen}
             title="Reschedule Follow-Up"
             onCancel={() => {
@@ -609,7 +609,7 @@ export default function Leads() {
 
             </Form>
 
-         </Modal>
+         </Modal> */}
       </div>
    );
 }
