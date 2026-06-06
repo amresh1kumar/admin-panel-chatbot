@@ -7,11 +7,13 @@
 
 /* Leads Container */
 .leads-container {
-   padding: 32px;
+   padding: 10px;
    background: #f5f9ff;
-   min-height: 100vh;
+   min-height: 80vh;
    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
    position: relative;
+   max-width: 100%; 
+   overflow-x: hidden;
 }
 
 .leads-container::before {
@@ -181,7 +183,7 @@
 .leads-table-container {
    background: #ffffff;
    border-radius: 18px;
-   padding: 24px;
+   padding: 20px;
    border: 1px solid #e5e7eb;
    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
    animation: fadeIn 0.5s ease;
