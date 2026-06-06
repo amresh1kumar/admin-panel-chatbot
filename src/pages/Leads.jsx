@@ -5,7 +5,7 @@ import { getLeads, deleteLead } from "../services/leadService";
 import { Table, Tag, Input, Button, Space, Popconfirm, Modal, Descriptions } from "antd";
 import {
    SearchOutlined,
-   PhoneOutlined,
+   WhatsAppOutlined,
    MailOutlined,
    CalendarOutlined,
    FilterOutlined,
@@ -72,7 +72,7 @@ export default function Leads() {
          render: (phone, record) => (
             <div className="contact-cell">
                <div className="contact-item">
-                  <PhoneOutlined className="contact-icon" />
+                  <WhatsAppOutlined className="contact-icon" style={{ fontSize: '14px' }} />
                   <span>{phone || "N/A"}</span>
                </div>
                {record.email && (
