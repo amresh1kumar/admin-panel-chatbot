@@ -50,3 +50,27 @@ export const addLeadNote = async (id, text) => {
    }
 };
 
+export const exportLeads = async () => {
+
+   try {
+
+      const res = await API.get(
+         "/leads/export",
+         {
+            responseType: "blob"
+         }
+      );
+
+      return res.data;
+
+   } catch (err) {
+
+      console.error(
+         "Export Leads Error:",
+         err.response?.data ||
+         err.message
+      );
+
+      throw err;
+   }
+};

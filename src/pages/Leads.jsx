@@ -19,6 +19,8 @@ import {
    CalendarOutlined,
 } from "@ant-design/icons";
 import "../styles/Leads.css";
+import { exportLeads } from "../services/leadService";
+import { DownloadOutlined } from "@ant-design/icons";
 
 export default function Leads() {
    const [leads, setLeads] = useState([]);
@@ -52,6 +54,31 @@ export default function Leads() {
       }
    };
 
+
+   const handleExport = async () => {
+      try {
+
+         const blob = await exportLeads();
+
+         const url = window.URL.createObjectURL(blob);
+
+         const link = document.createElement("a");
+
+         link.href = url;
+
+         link.download = "leads.xlsx";
+
+         document.body.appendChild(link);
+
+         link.click();
+
+         link.remove();
+
+      } catch (err) {
+
+         console.error(err);
+      }
+   };
 
    const columns = [
       {
@@ -203,6 +230,14 @@ export default function Leads() {
                className="search-input"
                allowClear
             />
+
+            <Button
+               type="primary"
+               icon={<DownloadOutlined />}
+               onClick={handleExport}
+            >
+               Export
+            </Button>
 
          </div>
 
