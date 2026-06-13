@@ -12,25 +12,21 @@ import BotMenu from "./pages/BotMenu";
 import { useAuth } from "./context/AuthContext";
 import Profile from "./pages/Profile";
 
-
 import ProtectedRoute from "./components/ProtectedRoute";
 import Broadcast from "./pages/Broadcast";
 
-import AdminProtectedRoute
-  from "./components/AdminProtectedRoute";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
 
-import AdminDashboard
-  from "./pages/Admin/AdminDashboard";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
 
-import AdminUsers
-  from "./pages/Admin/Users";
+import AdminUsers from "./pages/Admin/Users";
 
-import AdminTenants
-  from "./pages/Admin/Tenants";
+import AdminTenants from "./pages/Admin/Tenants";
 
-import AdminSubscriptions
-  from "./pages/Admin/AdminSubscriptions";
+import AdminSubscriptions from "./pages/Admin/AdminSubscriptions";
 import FollowUpSettings from "./pages/FollowUpSettings";
+import CallingSettings from "./pages/CallingSettings";
+
 function App() {
   const { token } = useAuth();
 
@@ -50,52 +46,28 @@ function App() {
             <Route path="/bot-messages" element={<BotMessage />} />
             <Route path="/bot-menus" element={<BotMenu />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/followup-settings"element={<FollowUpSettings />}/>
+            <Route path="/followup-settings" element={<FollowUpSettings />} />
+            <Route path="/calling-settings" element={<CallingSettings />} />
             <Route path="/broadcast" element={<Broadcast />} />
-            <Route
-              element={
-                <AdminProtectedRoute />
-              }
-            >
+            <Route element={<AdminProtectedRoute />}>
+              <Route path="/admin" element={<AdminDashboard />} />
 
-              <Route
-                path="/admin"
-                element={
-                  <AdminDashboard />
-                }
-              />
+              <Route path="/admin/users" element={<AdminUsers />} />
 
-              <Route
-                path="/admin/users"
-                element={
-                  <AdminUsers />
-                }
-              />
-
-              <Route
-                path="/admin/tenants"
-                element={
-                  <AdminTenants />
-                }
-              />
+              <Route path="/admin/tenants" element={<AdminTenants />} />
 
               <Route
                 path="/admin/subscriptions"
-                element={
-                  <AdminSubscriptions />
-                }
+                element={<AdminSubscriptions />}
               />
-
             </Route>
           </Route>
         </Route>
-
 
         <Route
           path="*"
           element={<Navigate to={token ? "/dashboard" : "/login"} />}
         />
-
       </Routes>
     </BrowserRouter>
   );

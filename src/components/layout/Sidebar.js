@@ -149,6 +149,12 @@ export default function Sidebar() {
                label: 'Follow-Up Settings',
                onClick: () =>
                   navigate('/followup-settings')
+            },
+            {
+               key: "/calling-settings",
+               label: "AI Calling Settings",
+               onClick: () =>
+                  navigate("/calling-settings")
             }
          ]
       },
