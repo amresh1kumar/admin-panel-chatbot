@@ -259,18 +259,18 @@ export default function Broadcast() {
                            value: "all",
                            label: `All Leads (${leads.length})`
                         },
-                        {
-                           value: "new",
-                           label: "New Leads"
-                        },
-                        {
-                           value: "contacted",
-                           label: "Contacted Leads"
-                        },
-                        {
-                           value: "closed",
-                           label: "Closed Leads"
-                        }
+                        // {
+                        //    value: "new",
+                        //    label: "New Leads"
+                        // },
+                        // {
+                        //    value: "contacted",
+                        //    label: "Contacted Leads"
+                        // },
+                        // {
+                        //    value: "closed",
+                        //    label: "Closed Leads"
+                        // }
                      ]}
                   />
                </Form.Item>
