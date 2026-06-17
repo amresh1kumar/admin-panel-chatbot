@@ -67,6 +67,10 @@ export default function CallingSettings() {
                <Input />
             </Form.Item>
 
+            <Form.Item label="Agent Phone Number ID" name="agentPhoneNumberId">
+               <Input />
+            </Form.Item>
+
             <Form.Item
                label="Enable Calling"
                name="enabled"

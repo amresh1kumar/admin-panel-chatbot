@@ -15,13 +15,57 @@ export default function UsersList({ onSelectUser }) {
       if (!tenantId) return;
 
       getUsers(tenantId)
-         .then(data => setUsers(data)) 
+         .then(data => setUsers(data))
          .catch(err => console.error(err));
    }, [tenantId]);
 
    const filteredUsers = (users || []).filter(user =>
       (user._id || "").toLowerCase().includes(searchQuery.toLowerCase())
    );
+
+   const formatChatTime = (date) => {
+      if (!date) return "--";
+
+      const msgDate = new Date(date);
+
+      // Invalid date check
+      if (isNaN(msgDate.getTime())) return "--";
+
+      const now = new Date();
+
+      // Today
+      if (msgDate.toDateString() === now.toDateString()) {
+         return msgDate.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+         });
+      }
+
+      // Difference in days
+      const diffDays = Math.floor(
+         (now.setHours(0, 0, 0, 0) - new Date(msgDate).setHours(0, 0, 0, 0)) /
+         (1000 * 60 * 60 * 24)
+      );
+
+      // Yesterday
+      if (diffDays === 1) {
+         return "Yesterday";
+      }
+
+      // Within last 7 days
+      if (diffDays < 7) {
+         return msgDate.toLocaleDateString("en-US", {
+            weekday: "short",
+         });
+      }
+
+      // Older than 7 days
+      return msgDate.toLocaleDateString("en-GB", {
+         day: "2-digit",
+         month: "2-digit",
+         year: "2-digit",
+      });
+   };
 
    return (
       <div className="users-list-container">
@@ -64,12 +108,7 @@ export default function UsersList({ onSelectUser }) {
                            {user._id.slice(0, 12)}
                         </div>
                         <div className="user-timestamp">
-                           {user.createdAt
-                              ? new Date(user.createdAt).toLocaleTimeString([], {
-                                 hour: "2-digit",
-                                 minute: "2-digit"
-                              })
-                              : "--"}
+                           {formatChatTime(user.lastMessageTime || user.updatedAt || user.createdAt)}
                         </div>
                      </div>
 
