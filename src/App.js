@@ -47,7 +47,7 @@ function App() {
             <Route path="/bot-menus" element={<BotMenu />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/followup-settings" element={<FollowUpSettings />} />
-            {/* <Route path="/calling-settings" element={<CallingSettings />} /> */}
+            <Route path="/calling-settings" element={<CallingSettings />} />
             <Route path="/broadcast" element={<Broadcast />} />
             <Route element={<AdminProtectedRoute />}>
               <Route path="/admin" element={<AdminDashboard />} />

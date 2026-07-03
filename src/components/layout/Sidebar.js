@@ -150,12 +150,12 @@ export default function Sidebar() {
                onClick: () =>
                   navigate('/followup-settings')
             },
-            // {
-            //    key: "/calling-settings",
-            //    label: "AI Calling Settings",
-            //    onClick: () =>
-            //       navigate("/calling-settings")
-            // }
+            {
+               key: "/calling-settings",
+               label: "AI Calling Settings",
+               onClick: () =>
+                  navigate("/calling-settings")
+            }
          ]
       },
 
