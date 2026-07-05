@@ -129,6 +129,12 @@ export default function Sidebar() {
                icon: <RobotOutlined />,
                label: 'Broadcast',
                onClick: () => navigate('/broadcast')
+            },
+            {
+               key: '/contacts',
+               icon: <RobotOutlined />,
+               label: 'Contacts',
+               onClick: () => navigate('/contacts')
             }
          ]
       },

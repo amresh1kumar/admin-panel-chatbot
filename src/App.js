@@ -26,6 +26,7 @@ import AdminTenants from "./pages/Admin/Tenants";
 import AdminSubscriptions from "./pages/Admin/AdminSubscriptions";
 import FollowUpSettings from "./pages/FollowUpSettings";
 import CallingSettings from "./pages/CallingSettings";
+import Contacts from "./pages/Contacts";
 
 function App() {
   const { token } = useAuth();
@@ -49,6 +50,7 @@ function App() {
             <Route path="/followup-settings" element={<FollowUpSettings />} />
             <Route path="/calling-settings" element={<CallingSettings />} />
             <Route path="/broadcast" element={<Broadcast />} />
+            <Route path="/contacts" element={<Contacts/>} />
             <Route element={<AdminProtectedRoute />}>
               <Route path="/admin" element={<AdminDashboard />} />
 

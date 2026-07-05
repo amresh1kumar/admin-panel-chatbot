@@ -5,6 +5,10 @@ import { Modal, Form, Input, message, Button, Select } from "antd";
 import { PlusOutlined, SearchOutlined, EyeOutlined } from "@ant-design/icons";
 import { Table, Tag } from "antd";
 import "../styles/Broadcast.css"
+import { getContacts } from "../services/contactService";
+import { getTemplates } from "../services/templateService";
+import { Upload } from "antd";
+import { uploadFile } from "../services/uploadService";
 
 export default function Broadcast() {
 
@@ -16,7 +20,14 @@ export default function Broadcast() {
    const [selectedBroadcast, setSelectedBroadcast] = useState(null);
    const [search, setSearch] = useState("");
    const [statusFilter, setStatusFilter] = useState("");
+   const [contacts, setContacts] = useState([]);
+   const [templates, setTemplates] = useState([]);
+   const [selectedTemplate, setSelectedTemplate] = useState(null);
+   const [params, setParams] = useState([]);
+   const [mediaUrl, setMediaUrl] = useState("");
+   const [filePreview, setFilePreview] = useState(null);
    const [form] = Form.useForm();
+
 
 
    useEffect(() => {
@@ -24,6 +35,14 @@ export default function Broadcast() {
       setLoading(true);
       getLeads()
          .then(data => setLeads(data || []))
+         .catch(err => console.error(err));
+
+      getContacts()
+         .then(data => setContacts(data || []))
+         .catch(err => console.error(err));
+
+      getTemplates()
+         .then(data => setTemplates(data || []))
          .catch(err => console.error(err));
 
       getBroadcastHistory({
@@ -37,6 +56,28 @@ export default function Broadcast() {
    }, [search, statusFilter]);
 
 
+   const handleTemplateChange = (value) => {
+
+      const template = templates.find(
+         t => t.name === value
+      );
+
+      setSelectedTemplate(template || null);
+
+      if (template) {
+         setParams(Array(template.params).fill(""));
+      } else {
+         setParams([]);
+      }
+
+   };
+
+   const handleParamChange = (value, index) => {
+      const updated = [...params];
+      updated[index] = value;
+      setParams(updated);
+   };
+
    const openDetailsModal = (record) => {
       setSelectedBroadcast(record);
       setDetailsModal(true);
@@ -45,15 +86,24 @@ export default function Broadcast() {
 
       try {
 
-         let filteredLeads = leads;
+         // let filteredLeads = leads;
 
-         if (values.audience !== "all") {
-            filteredLeads = leads.filter(
-               lead => lead.status === values.audience
-            );
+         let recipients = [];
+
+         if (values.audienceType === "contact") {
+            recipients = contacts;
+         } else {
+            recipients = leads;
          }
 
-         const ids = filteredLeads.map(lead => lead._id);
+         // if (values.audience !== "all") {
+         //    filteredLeads = leads.filter(
+         //       lead => lead.status === values.audience
+         //    );
+         // }
+
+         // const ids = filteredLeads.map(lead => lead._id);
+         const ids = recipients.map(item => item._id);
 
          if (ids.length === 0) {
             return message.warning("No leads found");
@@ -61,12 +111,25 @@ export default function Broadcast() {
 
          const res = await sendBulkMessage({
             ids,
+            name: values.name,
+            audienceType: values.audienceType,
+
+            type: values.type,
+
             message: values.message,
-            name: values.name
+
+            templateName: values.templateName,
+
+            params,
+
+            mediaUrl
          });
 
          message.success("Broadcast sent successfully");
-
+         setSelectedTemplate(null);
+         setParams([]);
+         setMediaUrl("");
+         setFilePreview(null);
          setOpenModal(false);
 
          form.resetFields();
@@ -83,6 +146,52 @@ export default function Broadcast() {
       }
    };
 
+
+   const handleCustomUpload = async (file) => {
+      try {
+
+         const url = await uploadFile(file);
+
+         setMediaUrl(url);
+         setFilePreview(url);
+
+         message.success("File uploaded");
+
+      } catch (err) {
+
+         message.error("Upload failed");
+
+      }
+   };
+
+
+   const handleRemove = () => {
+      setMediaUrl("");
+      setFilePreview(null);
+   };
+
+
+   const validateFile = (file) => {
+
+      const isValidType =
+         file.type.includes("image") ||
+         file.type.includes("pdf") ||
+         file.type.includes("video");
+
+      if (!isValidType) {
+         message.error("Only image, PDF or video allowed");
+         return Upload.LIST_IGNORE;
+      }
+
+      const isLessThan5MB = file.size / 1024 / 1024 < 5;
+
+      if (!isLessThan5MB) {
+         message.error("File must be less than 5MB");
+         return Upload.LIST_IGNORE;
+      }
+
+      return true;
+   };
 
 
 
@@ -242,7 +351,51 @@ export default function Broadcast() {
                >
                   <Input placeholder="Festival Offer" />
                </Form.Item>
+
                <Form.Item
+                  label="Audience Type"
+                  name="audienceType"
+                  initialValue="lead"
+                  rules={[
+                     {
+                        required: true,
+                        message: "Select audience type",
+                     },
+                  ]}
+               >
+                  <Select
+                     options={[
+                        {
+                           value: "lead",
+                           label: "Leads",
+                        },
+                        {
+                           value: "contact",
+                           label: "Contacts",
+                        },
+                     ]}
+                  />
+               </Form.Item>
+
+               <Form.Item
+                  label="Message Type"
+                  name="type"
+                  initialValue="text"
+               >
+                  <Select
+                     options={[
+                        {
+                           label: "Text",
+                           value: "text"
+                        },
+                        {
+                           label: "Template",
+                           value: "template"
+                        }
+                     ]}
+                  />
+               </Form.Item>
+               {/* <Form.Item
                   label="Audience"
                   name="audience"
                   rules={[
@@ -257,35 +410,162 @@ export default function Broadcast() {
                      options={[
                         {
                            value: "all",
-                           label: `All Leads (${leads.length})`
+                           label:
+                              form.getFieldValue("audienceType") === "contact"
+                                 ? `All Contacts (${contacts.length})`
+                                 : `All Leads (${leads.length})`,
                         },
-                        // {
-                        //    value: "new",
-                        //    label: "New Leads"
-                        // },
-                        // {
-                        //    value: "contacted",
-                        //    label: "Contacted Leads"
-                        // },
-                        // {
-                        //    value: "closed",
-                        //    label: "Closed Leads"
-                        // }
                      ]}
                   />
-               </Form.Item>
+               </Form.Item> */}
                <Form.Item
-                  label="Message"
-                  name="message"
-                  rules={[
-                     { required: true, message: "Enter message" }
-                  ]}
+                  noStyle
+                  shouldUpdate
                >
-                  <Input.TextArea
-                     rows={5}
-                     placeholder="Enter broadcast message..."
-                  />
+                  {({ getFieldValue }) =>
+
+                     getFieldValue("type") === "text" && (
+
+                        <Form.Item
+                           label="Message"
+                           name="message"
+                           rules={[
+                              {
+                                 required: true,
+                                 message: "Enter message"
+                              }
+                           ]}
+                        >
+                           <Input.TextArea rows={5} />
+                        </Form.Item>
+
+                     )
+
+                  }
                </Form.Item>
+
+               <Form.Item
+                  noStyle
+                  shouldUpdate
+               >
+                  {({ getFieldValue }) =>
+
+                     getFieldValue("type") === "template" && (
+
+                        <>
+
+                           <Form.Item
+                              label="Template"
+                              name="templateName"
+                              rules={[
+                                 {
+                                    required: true,
+                                    message: "Select Template"
+                                 }
+                              ]}
+                           >
+
+                              <Select
+                                 placeholder="Select Template"
+                                 onChange={handleTemplateChange}
+                              >
+
+                                 {templates.map(t => (
+
+                                    <Select.Option
+                                       key={t.name}
+                                       value={t.name}
+                                    >
+                                       {t.label}
+                                    </Select.Option>
+
+                                 ))}
+
+                              </Select>
+
+                           </Form.Item>
+
+                           {selectedTemplate &&
+                              params.map((p, index) => (
+
+                                 <Input
+                                    key={index}
+                                    placeholder={`Parameter ${index + 1}`}
+                                    value={p}
+                                    onChange={(e) =>
+                                       handleParamChange(
+                                          e.target.value,
+                                          index
+                                       )
+                                    }
+                                    style={{
+                                       marginBottom: 10
+                                    }}
+                                 />
+
+                              ))}
+
+                           <Form.Item label="Upload Media">
+                              <Upload
+                                 showUploadList={false}
+                                 beforeUpload={(file) => {
+
+                                    const valid = validateFile(file);
+
+                                    if (!valid) return false;
+
+                                    handleCustomUpload(file);
+
+                                    return false;
+
+                                 }}
+                              >
+                                 <Button>Upload File</Button>
+                              </Upload>
+
+                              {filePreview?.match(/\.(jpg|jpeg|png|webp)$/i) && (
+                                 <img
+                                    src={filePreview}
+                                    style={{
+                                       width: 120,
+                                       borderRadius: 8
+                                    }}
+                                 />
+                              )}
+
+                              {filePreview?.endsWith(".pdf") && (
+                                 <div>📄 PDF Uploaded</div>
+                              )}
+
+                              {filePreview?.match(/\.(mp4|webm)$/i) && (
+                                 <video
+                                    width="150"
+                                    controls
+                                    src={filePreview}
+                                 />
+                              )}
+
+                              <Button
+                                 danger
+                                 size="small"
+                                 style={{
+                                    marginTop: 8
+                                 }}
+                                 onClick={handleRemove}
+                              >
+                                 Remove
+                              </Button>
+                           </Form.Item>
+
+                        </>
+
+                     )
+
+                  }
+
+
+               </Form.Item>
+
 
                <Button
                   type="primary"
