@@ -26,7 +26,14 @@ import {
    DoubleRightOutlined,
    UserAddOutlined,
    LogoutOutlined,
-   UserOutlined
+   UserOutlined,
+   AppstoreOutlined,
+   PhoneOutlined,
+   ApartmentOutlined,
+   ShopOutlined,
+   SettingOutlined,
+   SafetyCertificateOutlined
+
 } from "@ant-design/icons";
 import API from "../../api/api";
 import { useTenant } from "../../context/TenantContext";
@@ -120,19 +127,19 @@ export default function Sidebar() {
             },
             {
                key: '/bot-menus',
-               icon: <RobotOutlined />,
+               icon: <AppstoreOutlined />,
                label: 'Bot Menus',
                onClick: () => navigate('/bot-menus')
             },
             {
                key: '/broadcast',
-               icon: <RobotOutlined />,
+               icon: <SendOutlined />,
                label: 'Broadcast',
                onClick: () => navigate('/broadcast')
             },
             {
                key: '/contacts',
-               icon: <RobotOutlined />,
+               icon: <TeamOutlined />,
                label: 'Contacts',
                onClick: () => navigate('/contacts')
             }
@@ -146,18 +153,19 @@ export default function Sidebar() {
       },
       {
          key: 'settings',
-         icon: <ApiOutlined />,
+         icon: <SettingOutlined />,
          label: 'Settings',
          children: [
             {
                key: '/followup-settings',
-               icon: <CommentOutlined />,
+               icon: <MessageOutlined />,  
                label: 'Follow-Up Settings',
                onClick: () =>
                   navigate('/followup-settings')
             },
             {
                key: "/calling-settings",
+               icon: <PhoneOutlined />,
                label: "AI Calling Settings",
                onClick: () =>
                   navigate("/calling-settings")
@@ -169,7 +177,7 @@ export default function Sidebar() {
          ? [
             {
                key: 'admin',
-               icon: <ApiOutlined />,
+               icon: <SafetyCertificateOutlined  />,
                label: 'Super Admin',
                children: [
                   {
@@ -188,14 +196,14 @@ export default function Sidebar() {
                   },
                   {
                      key: '/admin/tenants',
-                     icon: <GlobalOutlined />,
+                     icon: <ApartmentOutlined />,
                      label: 'Tenants',
                      onClick: () =>
                         navigate('/admin/tenants')
                   },
                   {
                      key: '/admin/subscriptions',
-                     icon: <ShoppingCartOutlined />,
+                     icon: <ShopOutlined />,
                      label: 'Subscriptions',
                      onClick: () =>
                         navigate('/admin/subscriptions')

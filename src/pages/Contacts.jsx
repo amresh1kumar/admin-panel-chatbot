@@ -26,6 +26,8 @@ import {
    deleteContact,
    importContacts,
    getContactStats,
+   getImportBatches,
+   deleteImportBatch,
 } from "../services/contactService";
 
 import "../styles/Contact.css";
@@ -35,6 +37,7 @@ export default function Contacts() {
    const [loading, setLoading] = useState(false);
    const [search, setSearch] = useState("");
    const [openModal, setOpenModal] = useState(false);
+   const [batches, setBatches] = useState([]);
 
    const [stats, setStats] = useState({
       total: 0,
@@ -76,6 +79,20 @@ export default function Contacts() {
       }
    };
 
+   const loadBatches = async () => {
+      try {
+
+         const data = await getImportBatches();
+
+         setBatches(data || []);
+
+      } catch (err) {
+
+         console.error(err);
+
+      }
+   };
+
    // ==========================
    // Refresh
    // ==========================
@@ -83,6 +100,7 @@ export default function Contacts() {
    const refreshData = () => {
       loadContacts();
       loadStats();
+      loadBatches();
    };
 
    useEffect(() => {
@@ -149,6 +167,24 @@ export default function Contacts() {
       }
 
       return false;
+   };
+
+   const handleDeleteBatch = async (id) => {
+
+      try {
+
+         await deleteImportBatch(id);
+
+         message.success("Batch deleted");
+
+         refreshData();
+
+      } catch (err) {
+
+         message.error("Delete failed");
+
+      }
+
    };
 
    // ==========================
@@ -276,6 +312,58 @@ export default function Contacts() {
             </Col>
 
          </Row>
+
+         <Card
+            title="Imported Excel Files"
+            style={{ marginBottom: 24 }}
+         >
+
+            <Table
+               rowKey="_id"
+               dataSource={batches}
+               pagination={false}
+               size="small"
+               columns={[
+                  {
+                     title: "File",
+                     dataIndex: "fileName"
+                  },
+                  {
+                     title: "Imported",
+                     dataIndex: "imported"
+                  },
+                  {
+                     title: "Duplicate",
+                     dataIndex: "duplicates"
+                  },
+                  {
+                     title: "Date",
+                     dataIndex: "createdAt",
+                     render: (date) =>
+                        new Date(date).toLocaleDateString("en-GB")
+                  },
+                  {
+                     title: "Action",
+                     render: (_, record) => (
+                        <Popconfirm
+                           title="Delete this batch?"
+                           onConfirm={() =>
+                              handleDeleteBatch(record._id)
+                           }
+                        >
+                           <Button
+                              danger
+                              size="small"
+                           >
+                              Delete Batch
+                           </Button>
+                        </Popconfirm>
+                     )
+                  }
+               ]}
+            />
+
+         </Card>
 
          {/* Search */}
 

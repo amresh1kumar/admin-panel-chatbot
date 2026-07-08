@@ -82,3 +82,41 @@ export const getContactStats = async () => {
    }
 
 };
+
+// Get Import Batches
+export const getImportBatches = async () => {
+   try {
+
+      const res = await API.get("/contacts/batches");
+
+      return res.data;
+
+   } catch (err) {
+
+      console.error(
+         "Get Import Batches Error:",
+         err.response?.data || err.message
+      );
+
+      throw err;
+   }
+};
+
+// Delete Import Batch
+export const deleteImportBatch = async (id) => {
+   try {
+
+      const res = await API.delete(`/contacts/batches/${id}`);
+
+      return res.data;
+
+   } catch (err) {
+
+      console.error(
+         "Delete Import Batch Error:",
+         err.response?.data || err.message
+      );
+
+      throw err;
+   }
+};

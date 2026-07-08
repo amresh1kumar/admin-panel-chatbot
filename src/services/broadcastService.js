@@ -60,28 +60,48 @@
 import API from "../api/api";
 
 export const sendBulkMessage = async ({
+   // ids,
+   // name,
+   // audienceType,
+
+   // // Text
+   // message,
+
+   // // Template
+   // type = "text",
+   // templateName = "",
+   // params = [],
+   // mediaUrl = ""
+
    ids,
+   message,
    name,
    audienceType,
-
-   // Text
-   message,
-
-   // Template
-   type = "text",
-   templateName = "",
-   params = [],
-   mediaUrl = ""
+   batchId,
+   type,
+   templateName,
+   params,
+   mediaUrl
 }) => {
    try {
 
       const res = await API.post("/bulk-message", {
+         // ids,
+         // name,
+         // audienceType,
+
+         // message,
+
+         // type,
+         // templateName,
+         // params,
+         // mediaUrl
+
          ids,
+         message,
          name,
          audienceType,
-
-         message,
-
+         batchId,
          type,
          templateName,
          params,

@@ -9,6 +9,7 @@ import { getContacts } from "../services/contactService";
 import { getTemplates } from "../services/templateService";
 import { Upload } from "antd";
 import { uploadFile } from "../services/uploadService";
+import { getImportBatches } from "../services/contactService";
 
 export default function Broadcast() {
 
@@ -26,8 +27,14 @@ export default function Broadcast() {
    const [params, setParams] = useState([]);
    const [mediaUrl, setMediaUrl] = useState("");
    const [filePreview, setFilePreview] = useState(null);
+   const [batches, setBatches] = useState([]);
    const [form] = Form.useForm();
 
+
+   const loadBatches = async () => {
+      const data = await getImportBatches();
+      setBatches(data);
+   };
 
 
    useEffect(() => {
@@ -55,12 +62,18 @@ export default function Broadcast() {
 
    }, [search, statusFilter]);
 
+   useEffect(() => {
+      loadBatches();
+   })
 
    const handleTemplateChange = (value) => {
 
-      const template = templates.find(
-         t => t.name === value
-      );
+      console.log("Selected Value:", value);
+      console.log("Templates:", templates);
+
+      const template = templates.find(t => t.name === value);
+
+      console.log("Found Template:", template);
 
       setSelectedTemplate(template || null);
 
@@ -115,6 +128,7 @@ export default function Broadcast() {
             audienceType: values.audienceType,
 
             type: values.type,
+            batchId: values.batchId,
 
             message: values.message,
 
@@ -192,6 +206,8 @@ export default function Broadcast() {
 
       return true;
    };
+
+
 
 
 
@@ -378,6 +394,47 @@ export default function Broadcast() {
                </Form.Item>
 
                <Form.Item
+                  noStyle
+                  shouldUpdate
+               >
+                  {({ getFieldValue }) =>
+
+                     getFieldValue("audienceType") === "contact" && (
+
+                        <Form.Item
+                           label="Import Batch"
+                           name="batchId"
+                           rules={[
+                              {
+                                 required: true,
+                                 message: "Select Import Batch"
+                              }
+                           ]}
+                        >
+
+                           <Select placeholder="Select Import Batch">
+
+                              {batches.map(batch => (
+
+                                 <Select.Option
+                                    key={batch._id}
+                                    value={batch._id}
+                                 >
+                                    {batch.fileName} ({batch.imported})
+                                 </Select.Option>
+
+                              ))}
+
+                           </Select>
+
+                        </Form.Item>
+
+                     )
+
+                  }
+               </Form.Item>
+
+               <Form.Item
                   label="Message Type"
                   name="type"
                   initialValue="text"
@@ -485,7 +542,17 @@ export default function Broadcast() {
 
                            </Form.Item>
 
+                           <Form.Item label="Template Preview">
+                              <Input.TextArea
+                                 rows={5}
+                                 value={selectedTemplate?.body || ""}
+                                 disabled
+                              />
+                           </Form.Item>
+
                            {selectedTemplate &&
+
+
                               params.map((p, index) => (
 
                                  <Input
@@ -504,58 +571,61 @@ export default function Broadcast() {
                                  />
 
                               ))}
+                           {selectedTemplate &&
+                              ["image", "video", "document"].includes(selectedTemplate.headerType) && (
+                                 <Form.Item label={`Upload ${selectedTemplate?.headerType || "Media"}`}>
+                                    <Upload
+                                       showUploadList={false}
+                                       beforeUpload={(file) => {
 
-                           <Form.Item label="Upload Media">
-                              <Upload
-                                 showUploadList={false}
-                                 beforeUpload={(file) => {
+                                          const valid = validateFile(file);
 
-                                    const valid = validateFile(file);
+                                          if (!valid) return false;
 
-                                    if (!valid) return false;
+                                          handleCustomUpload(file);
 
-                                    handleCustomUpload(file);
+                                          return false;
 
-                                    return false;
+                                       }}
+                                    >
+                                       <Button>Upload File</Button>
+                                    </Upload>
 
-                                 }}
-                              >
-                                 <Button>Upload File</Button>
-                              </Upload>
+                                    {filePreview?.match(/\.(jpg|jpeg|png|webp)$/i) && (
+                                       <img
+                                          src={filePreview}
+                                          style={{
+                                             width: 120,
+                                             borderRadius: 8
+                                          }}
+                                       />
+                                    )}
 
-                              {filePreview?.match(/\.(jpg|jpeg|png|webp)$/i) && (
-                                 <img
-                                    src={filePreview}
-                                    style={{
-                                       width: 120,
-                                       borderRadius: 8
-                                    }}
-                                 />
+                                    {filePreview?.endsWith(".pdf") && (
+                                       <div>📄 PDF Uploaded</div>
+                                    )}
+
+                                    {filePreview?.match(/\.(mp4|webm)$/i) && (
+                                       <video
+                                          width="150"
+                                          controls
+                                          src={filePreview}
+                                       />
+                                    )}
+
+                                    <Button
+                                       danger
+                                       size="small"
+                                       style={{
+                                          marginTop: 8
+                                       }}
+                                       onClick={handleRemove}
+                                    >
+                                       Remove
+                                    </Button>
+                                 </Form.Item>
+
                               )}
-
-                              {filePreview?.endsWith(".pdf") && (
-                                 <div>📄 PDF Uploaded</div>
-                              )}
-
-                              {filePreview?.match(/\.(mp4|webm)$/i) && (
-                                 <video
-                                    width="150"
-                                    controls
-                                    src={filePreview}
-                                 />
-                              )}
-
-                              <Button
-                                 danger
-                                 size="small"
-                                 style={{
-                                    marginTop: 8
-                                 }}
-                                 onClick={handleRemove}
-                              >
-                                 Remove
-                              </Button>
-                           </Form.Item>
 
                         </>
 
