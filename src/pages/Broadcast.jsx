@@ -64,7 +64,7 @@ export default function Broadcast() {
 
    useEffect(() => {
       loadBatches();
-   })
+   },[])
 
    const handleTemplateChange = (value) => {
 
