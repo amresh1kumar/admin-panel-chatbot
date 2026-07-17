@@ -200,12 +200,12 @@ export default function Contacts() {
          title: "Phone",
          dataIndex: "phone",
       },
-      {
-         title: "Source",
-         dataIndex: "source",
-         render: (source) =>
-            source.charAt(0).toUpperCase() + source.slice(1),
-      },
+      // {
+      //    title: "Source",
+      //    dataIndex: "source",
+      //    render: (source) =>
+      //       source.charAt(0).toUpperCase() + source.slice(1),
+      // },
       {
          title: "Created",
          dataIndex: "createdAt",
@@ -269,13 +269,13 @@ export default function Contacts() {
                   </Button>
                </Upload>
 
-               <Button
+               {/* <Button
                   type="primary"
                   icon={<PlusOutlined />}
                   onClick={() => setOpenModal(true)}
                >
                   Add Contact
-               </Button>
+               </Button> */}
 
             </div>
 
@@ -297,12 +297,12 @@ export default function Contacts() {
                </Card>
             </Col>
 
-            <Col xs={24} md={8}>
+            {/* <Col xs={24} md={8}>
                <Card>
                   <h3>Manual Contacts</h3>
                   <h1>{stats.manual}</h1>
                </Card>
-            </Col>
+            </Col> */}
 
             <Col xs={24} md={8}>
                <Card>
@@ -391,6 +391,8 @@ export default function Contacts() {
             pagination={{
                pageSize: 10,
             }}
+            size="small"
+
          />
 
          {/* Add Contact Modal */}
