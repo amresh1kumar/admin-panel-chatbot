@@ -30,6 +30,7 @@ export default function Broadcast() {
    const [filePreview, setFilePreview] = useState(null);
    const [batches, setBatches] = useState([]);
    const [syncLoading, setSyncLoading] = useState(false);
+   const [sending, setSending] = useState(false);
    const [form] = Form.useForm();
 
 
@@ -125,7 +126,7 @@ export default function Broadcast() {
    };
 
    const handleCreateBroadcast = async (values) => {
-
+      setSending(true);
       try {
 
          // let filteredLeads = leads;
@@ -148,7 +149,13 @@ export default function Broadcast() {
          const ids = recipients.map(item => item._id);
 
          if (ids.length === 0) {
-            return message.warning("No leads found");
+
+            return message.warning(
+               values.audienceType === "contact"
+                  ? "No contacts found"
+                  : "No leads found"
+            );
+
          }
 
          const res = await sendBulkMessage({
@@ -186,6 +193,10 @@ export default function Broadcast() {
          console.error(err);
 
          message.error("Failed to send broadcast");
+      } finally {
+
+         setSending(false);
+
       }
    };
 
@@ -755,6 +766,8 @@ export default function Broadcast() {
                   type="primary"
                   block
                   htmlType="submit"
+                  loading={sending}
+                  disabled={sending}
                >
                   Send Broadcast
                </Button>
