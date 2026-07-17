@@ -10,6 +10,7 @@ import { getTemplates } from "../services/templateService";
 import { Upload } from "antd";
 import { uploadFile } from "../services/uploadService";
 import { getImportBatches } from "../services/contactService";
+import { syncTemplates } from "../services/templateService";
 
 export default function Broadcast() {
 
@@ -28,6 +29,7 @@ export default function Broadcast() {
    const [mediaUrl, setMediaUrl] = useState("");
    const [filePreview, setFilePreview] = useState(null);
    const [batches, setBatches] = useState([]);
+   const [syncLoading, setSyncLoading] = useState(false);
    const [form] = Form.useForm();
 
 
@@ -64,7 +66,7 @@ export default function Broadcast() {
 
    useEffect(() => {
       loadBatches();
-   },[])
+   }, [])
 
    const handleTemplateChange = (value) => {
 
@@ -95,6 +97,33 @@ export default function Broadcast() {
       setSelectedBroadcast(record);
       setDetailsModal(true);
    };
+
+   const handleSyncTemplates = async () => {
+
+      try {
+
+         setSyncLoading(true);
+
+         const res = await syncTemplates();
+
+         const data = await getTemplates();
+
+         setTemplates(data || []);
+         message.success(
+            `Successfully synced ${res.total} WhatsApp templates.`
+         );
+      } catch (err) {
+
+         message.error("Failed to sync templates");
+
+      } finally {
+
+         setSyncLoading(false);
+
+      }
+
+   };
+
    const handleCreateBroadcast = async (values) => {
 
       try {
@@ -217,6 +246,24 @@ export default function Broadcast() {
          dataIndex: "name",
          key: "name"
       },
+      {
+         title: "Audience",
+         dataIndex: "audienceType",
+         render: (value) => (
+            <Tag color="blue">
+               {value === "lead" ? "Lead" : "Contact"}
+            </Tag>
+         )
+      },
+      {
+         title: "Type",
+         dataIndex: "type",
+         render: (value) => (
+            <Tag color={value === "template" ? "purple" : "green"}>
+               {value === "template" ? "Template" : "Text"}
+            </Tag>
+         )
+      },
 
       {
          title: "Status",
@@ -293,13 +340,28 @@ export default function Broadcast() {
                </p>
             </div>
 
-            <Button
-               type="primary"
-               icon={<PlusOutlined />}
-               onClick={() => setOpenModal(true)}
+            <div
+               style={{
+                  display: "flex",
+                  gap: 10
+               }}
             >
-               Create Broadcast
-            </Button>
+
+               <Button
+                  onClick={handleSyncTemplates}
+               >
+                  Sync Templates
+               </Button>
+
+               <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={() => setOpenModal(true)}
+               >
+                  Create Broadcast
+               </Button>
+
+            </div>
 
 
          </div>
@@ -511,7 +573,59 @@ export default function Broadcast() {
 
                         <>
 
-                           <Form.Item
+
+                           {templates.length === 0 ? (
+
+                              <div
+                                 style={{
+                                    padding: 16,
+                                    background: "#fff7e6",
+                                    border: "1px solid #ffd591",
+                                    borderRadius: 8,
+                                    marginBottom: 16,
+                                 }}
+                              >
+                                 <p style={{ marginBottom: 12 }}>
+                                    No templates found. Please sync your WhatsApp templates first.
+                                 </p>
+
+                                 <Button
+                                    loading={syncLoading}
+                                    onClick={handleSyncTemplates}
+                                 >
+                                    Sync Templates
+                                 </Button>
+                              </div>
+
+                           ) : (
+
+                              <Form.Item
+                                 label="Template"
+                                 name="templateName"
+                                 rules={[
+                                    {
+                                       required: true,
+                                       message: "Select Template"
+                                    }
+                                 ]}
+                              >
+                                 <Select
+                                    placeholder="Select Template"
+                                    onChange={handleTemplateChange}
+                                 >
+                                    {templates.map(t => (
+                                       <Select.Option
+                                          key={t.name}
+                                          value={t.name}
+                                       >
+                                          {t.label}
+                                       </Select.Option>
+                                    ))}
+                                 </Select>
+                              </Form.Item>
+
+                           )}
+                           {/* <Form.Item
                               label="Template"
                               name="templateName"
                               rules={[
@@ -540,7 +654,7 @@ export default function Broadcast() {
 
                               </Select>
 
-                           </Form.Item>
+                           </Form.Item> */}
 
                            <Form.Item label="Template Preview">
                               <Input.TextArea
@@ -653,6 +767,13 @@ export default function Broadcast() {
             open={detailsModal}
             onCancel={() => setDetailsModal(false)}
             footer={null}
+            styles={{
+               body: {
+                  maxHeight: "70vh",
+                  overflowY: "auto",
+                  paddingRight: 8,
+               },
+            }}
          >
             {selectedBroadcast && (
 
@@ -662,6 +783,117 @@ export default function Broadcast() {
                      <strong>Campaign:</strong>
                      <p>{selectedBroadcast.name}</p>
                   </div>
+
+                  <div className="broadcast-detail-item">
+                     <strong>Audience:</strong>
+
+                     <p>
+                        {selectedBroadcast.audienceType === "lead"
+                           ? "Lead"
+                           : "Contact"}
+                     </p>
+                  </div>
+
+                  <div className="broadcast-detail-item">
+                     <strong>Message Type:</strong>
+
+                     <p>
+                        {selectedBroadcast.type === "template"
+                           ? "Template"
+                           : "Text"}
+                     </p>
+                  </div>
+
+                  {selectedBroadcast.type === "template" && (
+
+                     <div className="broadcast-detail-item">
+
+                        <strong>Template:</strong>
+
+                        <p>
+                           {selectedBroadcast.templateLabel || selectedBroadcast.templateName}
+                        </p>
+
+                     </div>
+
+                  )}
+
+                  {selectedBroadcast.templateBody && (
+
+                     <div className="broadcast-detail-item">
+
+                        <strong>Template Body:</strong>
+
+                        <p>
+                           {selectedBroadcast.templateBody}
+                        </p>
+
+                     </div>
+
+                  )}
+
+                  {selectedBroadcast.params?.length > 0 && (
+
+                     <div className="broadcast-detail-item">
+
+                        <strong>Parameters:</strong>
+
+                        <p>
+                           {selectedBroadcast.params.join(", ")}
+                        </p>
+
+                     </div>
+
+                  )}
+
+                  {selectedBroadcast.mediaUrl && (
+
+                     <div className="broadcast-detail-item">
+
+                        <strong>Media:</strong>
+
+                        <div style={{ marginTop: 10 }}>
+
+                           {selectedBroadcast.mediaUrl.match(/\.(jpg|jpeg|png|webp)$/i) && (
+
+                              <img
+                                 src={selectedBroadcast.mediaUrl}
+                                 alt="media"
+                                 style={{
+                                    width: 180,
+                                    borderRadius: 8
+                                 }}
+                              />
+
+                           )}
+
+                           {selectedBroadcast.mediaUrl.match(/\.(mp4|webm)$/i) && (
+
+                              <video
+                                 width="220"
+                                 controls
+                                 src={selectedBroadcast.mediaUrl}
+                              />
+
+                           )}
+
+                           {selectedBroadcast.mediaUrl.endsWith(".pdf") && (
+
+                              <a
+                                 href={selectedBroadcast.mediaUrl}
+                                 target="_blank"
+                                 rel="noreferrer"
+                              >
+                                 📄 View PDF
+                              </a>
+
+                           )}
+
+                        </div>
+
+                     </div>
+
+                  )}
 
                   <div className="broadcast-detail-item">
                      <strong>Status:</strong>
