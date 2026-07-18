@@ -1,21 +1,21 @@
 .broadcast-page {
-   padding: 24px;
+   padding: 8px;
 }
 
 .broadcast-header {
    display: flex;
    justify-content: space-between;
    align-items: center;
-   margin-bottom: 24px;
+   /* margin-bottom: 24px; */
    gap: 16px;
    flex-wrap: wrap;
 }
 
 .broadcast-page-title {
-   font-size: 28px;
+   font-size: 20px;
    font-weight: 700;
    margin: 0;
-   color: #111827;
+   color: #111827 !important;
 }
 
 .broadcast-page-subtitle {

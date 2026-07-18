@@ -12,14 +12,12 @@ import {
    Row,
    Col,
 } from "antd";
-
 import {
    PlusOutlined,
    SearchOutlined,
    DeleteOutlined,
    UploadOutlined,
 } from "@ant-design/icons";
-
 import {
    getContacts,
    createContact,
@@ -29,7 +27,6 @@ import {
    getImportBatches,
    deleteImportBatch,
 } from "../services/contactService";
-
 import "../styles/Contact.css";
 
 export default function Contacts() {
@@ -223,7 +220,8 @@ export default function Contacts() {
             >
                <Button
                   danger
-                  icon={<DeleteOutlined />}
+                  // icon={<DeleteOutlined />}
+                  size="small"
                >
                   Delete
                </Button>
@@ -321,7 +319,9 @@ export default function Contacts() {
             <Table
                rowKey="_id"
                dataSource={batches}
-               pagination={false}
+               pagination={{
+                  pageSize: 10,
+               }}
                size="small"
                columns={[
                   {

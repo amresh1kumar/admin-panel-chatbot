@@ -417,13 +417,21 @@ export default function Broadcast() {
             dataSource={broadcasts}
             rowKey="_id"
             loading={loading}
-            pagination={{ pageSize: 5 }}
+            pagination={{ pageSize: 8 }}
+            size="small"
          />
          <Modal
             title="Create Broadcast"
             open={openModal}
             onCancel={() => setOpenModal(false)}
             footer={null}
+            styles={{
+               body: {
+                  maxHeight: "70vh",
+                  overflowY: "auto",
+                  paddingRight: 8,
+               },
+            }}
          >
             <Form
                layout="vertical"
