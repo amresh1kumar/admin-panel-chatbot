@@ -61,3 +61,23 @@ export const sendTemplateMessage = async (
       throw err;
    }
 };
+
+export const takeOverConversation = async (phone) => {
+   try {
+      const res = await API.put(`/conversations/takeover/${phone}`);
+      return res.data;
+   } catch (error) {
+      console.error("Take Over Error:", error);
+      throw error;
+   }
+};
+
+export const resumeBotConversation = async (phone) => {
+   try {
+      const res = await API.put(`/conversations/resume/${phone}`);
+      return res.data;
+   } catch (error) {
+      console.error("Resume Bot Error:", error);
+      throw error;
+   }
+};

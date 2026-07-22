@@ -1,13 +1,24 @@
 import { useEffect, useState, useRef } from "react";
 import { Dropdown, Modal, message, Select, Input, Button } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
-import { getChats, sendChatMessage, markAsRead, clearChat } from "../../services/chatService";
-import { getTemplates, sendTemplateMessage, syncTemplates } from "../../services/templateService";
+import {
+   getChats,
+   sendChatMessage,
+   markAsRead,
+   clearChat,
+   takeOverConversation,
+   resumeBotConversation,
+} from "../../services/chatService";
+import {
+   getTemplates,
+   sendTemplateMessage,
+   syncTemplates,
+} from "../../services/templateService";
 import {
    UserOutlined,
    SendOutlined,
    PaperClipOutlined,
-   SmileOutlined
+   SmileOutlined,
 } from "@ant-design/icons";
 import socket from "../../socket";
 import "../../styles/ChatWindow.css";
@@ -22,32 +33,67 @@ export default function ChatWindow({ user }) {
    const [selectedTemplate, setSelectedTemplate] = useState(null);
    const [params, setParams] = useState([]);
    const [mediaUrl, setMediaUrl] = useState("");
+   const [conversation, setConversation] = useState({ mode: "bot", takenBy: null, });
 
    const bottomRef = useRef(null);
+
+   const loadChat = async () => {
+      if (!user) return;
+
+      setLoading(true);
+
+      try {
+         const data = await getChats(user);
+
+         setMessages(data.chats || []);
+         setConversation(
+            data.conversation || {
+               mode: "bot",
+               takenBy: null,
+            }
+         );
+
+         // await markAsRead(user);
+         // Fire & Forget
+         markAsRead(user).catch(console.error);
+      } catch (err) {
+         console.error(err);
+      } finally {
+         setLoading(false);
+      }
+   };
 
    //JOIN ROOM (only when user changes)
    useEffect(() => {
       if (!user) return;
 
       socket.emit("join", String(user));
-
    }, [user]);
 
    // INITIAL FETCH (only once per user)
+   // useEffect(() => {
+   //    if (!user) return;
+
+   //    setLoading(true);
+
+   //    getChats(user)
+   //       .then((data) => {
+   //          setMessages(data.chats || []);
+   //          setConversation(
+   //             data.conversation || {
+   //                mode: "bot",
+   //                takenBy: null,
+   //             }
+   //          );
+   //       })
+   //       .catch((err) => console.error(err))
+   //       .finally(() => setLoading(false));
+
+   //    markAsRead(user);
+   // }, [user]);
+
    useEffect(() => {
-      if (!user) return;
-
-      setLoading(true);
-
-      getChats(user)
-         .then(data => {
-            setMessages(data); // only initial load
-         })
-         .catch(err => console.error(err))
-         .finally(() => setLoading(false));
-
-      markAsRead(user);
-
+      loadChat();
    }, [user]);
 
    //SOCKET LISTENER (REALTIME)
@@ -55,8 +101,8 @@ export default function ChatWindow({ user }) {
       const handleMessage = (msg) => {
          console.log("SOCKET RECEIVED:", msg);
 
-         setMessages(prev => {
-            const exists = prev.some(m => m._id === msg._id);
+         setMessages((prev) => {
+            const exists = prev.some((m) => m._id === msg._id);
             if (exists) return prev;
 
             return [...prev, { ...msg }]; //force re-render
@@ -108,14 +154,11 @@ export default function ChatWindow({ user }) {
       });
    };
 
-
-
-
    const openTemplateModal = () => {
       setIsModalOpen(true);
    };
    const handleTemplateChange = (value) => {
-      const template = templates.find(t => t.name === value);
+      const template = templates.find((t) => t.name === value);
       setSelectedTemplate(template);
       setParams(Array(template.params).fill(""));
    };
@@ -150,7 +193,6 @@ export default function ChatWindow({ user }) {
       return text;
    };
 
-
    useEffect(() => {
       const fetchTemplates = async () => {
          try {
@@ -172,38 +214,70 @@ export default function ChatWindow({ user }) {
          // refresh templates
          const data = await getTemplates();
          setTemplates(data);
-
       } catch (err) {
          console.error(err);
          message.error("Sync failed");
       }
    };
+
+   const handleTakeOver = async () => {
+      try {
+         await takeOverConversation(user);
+
+         await loadChat();
+
+         message.success("Conversation taken over");
+      } catch (err) {
+         message.error("Take Over failed");
+      }
+   };
+
+   const handleResumeBot = async () => {
+      try {
+         await resumeBotConversation(user);
+
+         await loadChat();
+
+         message.success("Bot resumed");
+      } catch (err) {
+         message.error("Resume failed");
+      }
+   };
+
    if (!user) {
       return (
          <div className="chat-empty-state">
             <div className="empty-content">
                <div className="empty-icon-wrapper">💬</div>
                <h3 className="empty-title">WhatsApp Web</h3>
-               <p className="empty-text">
-                  Select a chat to start messaging
-               </p>
+               <p className="empty-text">Select a chat to start messaging</p>
             </div>
          </div>
       );
    }
 
-
    return (
       <div className="chat-window">
-
          {/* Header */}
          <div className="chat-header">
+
             <div className="chat-header-left">
                <div className="chat-avatar">
                   <UserOutlined className="avatar-icon" />
                </div>
                <div className="chat-user-info">
                   <h3 className="chat-user-name">{user}</h3>
+               </div>
+               <div >
+                  {conversation.mode === "bot" ? (
+                     <Button type="primary" onClick={handleTakeOver}>
+                        Take Over
+                     </Button>
+                  ) : (
+                     <Button danger onClick={handleResumeBot}>
+                        Resume Bot
+                     </Button>
+                  )}
                </div>
             </div>
 
@@ -226,7 +300,7 @@ export default function ChatWindow({ user }) {
                            key: "sync",
                            label: "Sync Templates",
                            onClick: handleSyncTemplates,
-                        }
+                        },
                      ],
                   }}
                   trigger={["click"]}
@@ -247,35 +321,38 @@ export default function ChatWindow({ user }) {
                </div>
             )}
 
-            {!loading && (messages || []).map((msg) => (
-               <div
-                  key={msg._id}
-                  className={`message-wrapper ${msg.type === "user" ? "user" : "bot"}`}
-               >
-                  <div className={`message-bubble ${msg.type === "user" ? "user" : "bot"}`}>
-                     <div className="message-text">{msg.message}</div>
+            {!loading &&
+               (messages || []).map((msg) => (
+                  <div
+                     key={msg._id}
+                     className={`message-wrapper ${msg.type === "user" ? "user" : "bot"}`}
+                  >
+                     <div
+                        className={`message-bubble ${msg.type === "user" ? "user" : "bot"}`}
+                     >
+                        <div className="message-text">{msg.message}</div>
 
-                     <div className="message-meta">
-                        <span className="message-time">
-                           {msg.createdAt
-                              ? new Date(msg.createdAt).toLocaleTimeString([], {
-                                 hour: "2-digit",
-                                 minute: "2-digit"
-                              })
-                              : "--"}
-                        </span>
-
-                        {msg.type === "bot" && (
-                           <span className="message-status">
-                              {msg.status === "sent" && "✓"}
-                              {msg.status === "delivered" && "✓✓"}
-                              {msg.status === "read" && "✓✓"}
+                        <div className="message-meta">
+                           <span className="message-time">
+                              {msg.createdAt
+                                 ? new Date(msg.createdAt).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                 })
+                                 : "--"}
                            </span>
-                        )}
+
+                           {msg.type === "bot" && (
+                              <span className="message-status">
+                                 {msg.status === "sent" && "✓"}
+                                 {msg.status === "delivered" && "✓✓"}
+                                 {msg.status === "read" && "✓✓"}
+                              </span>
+                           )}
+                        </div>
                      </div>
                   </div>
-               </div>
-            ))}
+               ))}
 
             <div ref={bottomRef}></div>
          </div>
@@ -283,7 +360,6 @@ export default function ChatWindow({ user }) {
          {/* Input */}
          <div className="chat-input-area">
             <div className="chat-input-wrapper">
-
                {/* <button className="input-action-btn">
                   <SmileOutlined className="input-icon" />
                </button>
@@ -294,7 +370,7 @@ export default function ChatWindow({ user }) {
 
                <input
                   value={input}
-                  onChange={e => setInput(e.target.value)}
+                  onChange={(e) => setInput(e.target.value)}
                   placeholder="Type a message"
                   onKeyDown={(e) => e.key === "Enter" && handleSend()}
                   className="chat-input"
@@ -307,7 +383,6 @@ export default function ChatWindow({ user }) {
                >
                   <SendOutlined className="send-icon" />
                </button>
-
             </div>
          </div>
          <Modal
@@ -321,7 +396,7 @@ export default function ChatWindow({ user }) {
                style={{ width: "100%", marginBottom: 10 }}
                onChange={handleTemplateChange}
             >
-               {templates.map(t => (
+               {templates.map((t) => (
                   <Select.Option key={t.name} value={t.name}>
                      {t.label}
                   </Select.Option>
@@ -354,13 +429,11 @@ export default function ChatWindow({ user }) {
                      background: "#f0f2f5",
                      padding: "10px",
                      borderRadius: "8px",
-                     marginBottom: "10px"
+                     marginBottom: "10px",
                   }}
                >
                   <strong>Preview:</strong>
-                  <div style={{ marginTop: "5px" }}>
-                     {generatePreview()}
-                  </div>
+                  <div style={{ marginTop: "5px" }}>{generatePreview()}</div>
                </div>
             )}
 
