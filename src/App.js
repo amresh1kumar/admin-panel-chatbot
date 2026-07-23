@@ -27,6 +27,9 @@ import AdminSubscriptions from "./pages/Admin/AdminSubscriptions";
 import FollowUpSettings from "./pages/FollowUpSettings";
 import CallingSettings from "./pages/CallingSettings";
 import Contacts from "./pages/Contacts";
+import Landing from "./pages/Landing/Landing";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 
 function App() {
   const { token } = useAuth();
@@ -35,8 +38,44 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Public Routes */}
+        {/* <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/register" element={<Register />} /> */}
+        <Route
+          path="/"
+          element={
+            token ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Landing />
+            )
+          }
+        />
+
+        <Route
+          path="/login"
+          element={
+            token ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Login />
+            )
+          }
+        />
+
+        <Route
+          path="/register"
+          element={
+            token ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Register />
+            )
+          }
+        />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
+
 
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
@@ -50,7 +89,7 @@ function App() {
             <Route path="/followup-settings" element={<FollowUpSettings />} />
             <Route path="/calling-settings" element={<CallingSettings />} />
             <Route path="/broadcast" element={<Broadcast />} />
-            <Route path="/contacts" element={<Contacts/>} />
+            <Route path="/contacts" element={<Contacts />} />
             <Route element={<AdminProtectedRoute />}>
               <Route path="/admin" element={<AdminDashboard />} />
 
@@ -66,9 +105,15 @@ function App() {
           </Route>
         </Route>
 
+        {/* <Route
+          path="*"
+          // element={<Navigate to={token ? "/dashboard" : "/login"} />}
+          element={<Navigate to={token ? "/dashboard" : "/"} />}
+        /> */}
+
         <Route
           path="*"
-          element={<Navigate to={token ? "/dashboard" : "/login"} />}
+          element={<Navigate to={token ? "/dashboard" : "/"} replace />}
         />
       </Routes>
     </BrowserRouter>
