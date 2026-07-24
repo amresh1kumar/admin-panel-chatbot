@@ -7,6 +7,7 @@ import WhyUs from "../../components/Landing/WhyUs";
 import Pricing from "../../components/Landing/Pricing";
 import FAQ from "../../components/Landing/FAQ";
 import Footer from "../../components/Landing/Footer";
+import UseCases from "../../components/Landing/UseCases";
 
 const Landing = () => {
    return (
@@ -14,6 +15,7 @@ const Landing = () => {
          <Navbar />
          <Hero />
          <Features />
+         <UseCases/>
          <HowItWorks />
          <DashboardPreview />
          <WhyUs />

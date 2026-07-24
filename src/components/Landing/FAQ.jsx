@@ -285,7 +285,7 @@ const FAQItem = ({ faq, index, isOpen, onToggle }) => {
                         </p>
 
                         {/* Action Buttons */}
-                        <div className="mt-4 flex gap-3">
+                        {/* <div className="mt-4 flex gap-3">
                            <button className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700">
                               <FiMessageCircle className="h-4 w-4" />
                               Get Started
@@ -294,7 +294,7 @@ const FAQItem = ({ faq, index, isOpen, onToggle }) => {
                               <FiHelpCircle className="h-4 w-4" />
                               Learn More
                            </button>
-                        </div>
+                        </div> */}
                      </div>
                   </div>
                </div>

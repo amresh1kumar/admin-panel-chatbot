@@ -329,16 +329,16 @@ const POLICY_SECTIONS = [
          "To exercise any of these rights, please contact us at support@spadvertising.in"
       ]
    },
-   {
-      id: 8,
-      title: "8. Contact Information",
-      icon: FiHelpCircle,
-      color: "blue",
-      gradient: "from-blue-500 to-indigo-600",
-      content: [
-         "If you have any questions, concerns, or requests regarding this Privacy Policy, please contact us through the following channels:"
-      ]
-   }
+   // {
+   //    id: 8,
+   //    title: "8. Contact Information",
+   //    icon: FiHelpCircle,
+   //    color: "blue",
+   //    gradient: "from-blue-500 to-indigo-600",
+   //    content: [
+   //       "If you have any questions, concerns, or requests regarding this Privacy Policy, please contact us through the following channels:"
+   //    ]
+   // }
 ];
 
 const QUICK_LINKS = [
@@ -446,7 +446,7 @@ const ContactCard = () => (
                </div>
                <span className="font-semibold text-gray-900">Email</span>
             </div>
-            <a href="mailto:support@spadvertising.in" className="text-blue-600 hover:underline">
+            <a href="mailto:spadvertising@live.com" className="text-blue-600 hover:underline">
                support@spadvertising.in
             </a>
          </div>
@@ -470,7 +470,7 @@ const ContactCard = () => (
                </div>
                <span className="font-semibold text-gray-900">Location</span>
             </div>
-            <a href="#" className="text-purple-600">India</a>
+            <a href="#" className="text-purple-600">Raipur, Chhattisgarh, India</a>
          </div>
 
          <div className="rounded-2xl bg-gradient-to-br from-orange-50 to-red-50 p-5 border border-orange-200">
@@ -480,7 +480,7 @@ const ContactCard = () => (
                </div>
                <span className="font-semibold text-gray-900">WhatsApp</span>
             </div>
-            <a href="https://wa.me/91XXXXXXXXXX" className="text-orange-600 hover:underline" target="_blank" rel="noopener noreferrer">
+            <a href="https://wa.me/918085354646" className="text-orange-600 hover:underline" target="_blank" rel="noopener noreferrer">
                Chat on WhatsApp
             </a>
          </div>
@@ -568,7 +568,7 @@ const PrivacyPolicy = () => {
                      <ContactCard />
 
                      {/* Quick Links */}
-                     <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+                     {/* <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
                         <h3 className="font-semibold text-gray-900 mb-4">Quick Links</h3>
                         <div className="flex flex-wrap gap-3">
                            {QUICK_LINKS.map((link, index) => (
@@ -582,13 +582,13 @@ const PrivacyPolicy = () => {
                               </Link>
                            ))}
                         </div>
-                     </div>
+                     </div> */}
                   </div>
 
                </div>
 
                {/* Bottom CTA */}
-               <div className="mt-16 text-center">
+               {/* <div className="mt-16 text-center">
                   <div className="mx-auto max-w-2xl rounded-3xl bg-gradient-to-r from-blue-600 via-green-500 to-emerald-600 p-1">
                      <div className="rounded-[calc(1.5rem-1px)] bg-white px-8 py-10">
                         <h3 className="text-2xl font-bold text-gray-900">
@@ -615,7 +615,7 @@ const PrivacyPolicy = () => {
                         </div>
                      </div>
                   </div>
-               </div>
+               </div> */}
 
             </div>
          </section>

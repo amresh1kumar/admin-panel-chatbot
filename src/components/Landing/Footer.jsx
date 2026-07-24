@@ -202,22 +202,24 @@ import {
    FiFileText,
    FiShield,
    FiLogIn,
-   FiUserPlus
+   FiUserPlus,
+   FiFacebook
 } from "react-icons/fi";
 import {
    RiWhatsappLine,
    RiRobot2Line,
-   RiDashboardLine
+   RiDashboardLine,
+   RiYoutubeFill
 } from "react-icons/ri";
+import logo from "../../assets/images/logo.png";
+
 
 // ==================== CONSTANTS ====================
 
 const FOOTER_LINKS = {
    product: [
-      { label: "Features", href: "#features", icon: FiZap },
-      { label: "Pricing", href: "#pricing", icon: FiSend },
-      { label: "FAQ", href: "#faq", icon: FiHelpCircle },
-      { label: "AI Chatbot", href: "#features", icon: RiRobot2Line },
+      { label: "WhatsApp", href: "#whatsapp", icon: FiZap },
+      { label: "Voice AI", href: "#voiceai ", icon: FiSend },
    ],
    company: [
       { label: "Privacy Policy", to: "/privacy-policy", icon: FiShield },
@@ -226,15 +228,14 @@ const FOOTER_LINKS = {
       { label: "Register", to: "/register", icon: FiUserPlus },
    ],
    contact: [
-      { icon: FiMail, text: "support@spadvertising.tech", href: "mailto:support@spadvertising.tech" },
-      { icon: FiGlobe, text: "www.spadvertising.tech", href: "https://www.spadvertising.tech" },
-      { icon: FiMapPin, text: "India", href: "#" },
+      { icon: FiMail, text: "spadvertising@live.com", href: "mailto:spadvertising@live.com" },
+      { icon: FiGlobe, text: "https://spadvertising.in/", href: "https://www.spadvertising.tech" },
+      { icon: FiMapPin, text: "Raipur, Chhattisgarh", href: "#" },
    ],
    social: [
-      { icon: FiTwitter, href: "#", label: "Twitter" },
-      { icon: FiLinkedin, href: "#", label: "LinkedIn" },
-      { icon: FiInstagram, href: "#", label: "Instagram" },
-      { icon: RiWhatsappLine, href: "#", label: "WhatsApp" },
+      { icon: FiFacebook, href: "https://www.facebook.com/spadvertisingraipur", label: "Facebook" },
+      { icon: FiLinkedin, href: "https://www.linkedin.com/company/sp-advertising20/posts/?feedView=all", label: "LinkedIn" },
+      { icon: FiInstagram, href: "https://www.instagram.com/spadvertisingrpr/", label: "Instagram" },
    ],
 };
 
@@ -251,10 +252,17 @@ const FEATURES_LIST = [
 const BrandSection = () => (
    <div>
       <div className="flex items-center gap-3">
-         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-green-500">
+         {/* <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-green-500">
             <RiWhatsappLine className="h-7 w-7 text-white" />
-         </div>
-         <h2 className="text-2xl font-bold text-white">SP Advertising</h2>
+         </div> */}
+         {/* <h2 className="text-2xl font-bold text-white">SP Advertising</h2> */}
+         <Link to="/" className="flex items-center">
+            <img
+               src={logo}
+               alt="SP Advertising"
+               className="h-14 w-auto transition duration-300 hover:scale-110"
+            />
+         </Link>
       </div>
 
       <p className="mt-5 leading-7 text-gray-400">
@@ -300,7 +308,7 @@ const FooterLinkGroup = ({ title, links }) => (
                      to={link.to}
                      className="group flex items-center gap-2 text-gray-400 transition hover:text-green-400"
                   >
-                     <Icon className="h-4 w-4 text-gray-600 transition group-hover:text-green-400" />
+                     {/* <Icon className="h-4 w-4 text-gray-600 transition group-hover:text-green-400" /> */}
                      {link.label}
                   </Link>
                </li>
@@ -310,7 +318,7 @@ const FooterLinkGroup = ({ title, links }) => (
                      href={link.href}
                      className="group flex items-center gap-2 text-gray-400 transition hover:text-green-400"
                   >
-                     <Icon className="h-4 w-4 text-gray-600 transition group-hover:text-green-400" />
+                     {/* <Icon className="h-4 w-4 text-gray-600 transition group-hover:text-green-400" /> */}
                      {link.label}
                   </a>
                </li>

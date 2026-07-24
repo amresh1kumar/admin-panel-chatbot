@@ -241,8 +241,8 @@ const BENEFITS = [
 const FLOATING_STATS = [
    {
       position: "-left-8 top-10",
-      label: "Messages Today",
-      value: "+2,480",
+      label: "Messages",
+      value: "+200",
       icon: FiTrendingUp,
       color: "green",
    },

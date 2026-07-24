@@ -28,6 +28,7 @@ import FollowUpSettings from "./pages/FollowUpSettings";
 import CallingSettings from "./pages/CallingSettings";
 import Contacts from "./pages/Contacts";
 import Landing from "./pages/Landing/Landing";
+import VoiceAI from "./pages/Landing/VoiceAI";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 
@@ -75,6 +76,7 @@ function App() {
         />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/voice-ai" element={<VoiceAI />} />
 
 
         <Route element={<ProtectedRoute />}>

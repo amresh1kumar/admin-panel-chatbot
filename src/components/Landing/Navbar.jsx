@@ -104,76 +104,42 @@ const MENU_DATA = [
          {
             label: "WhatsApp",
             Icon: RiWhatsappLine,
-            href: "#",
+            to: "/",
             description: "Official Business API",
             badge: "OFFICIAL",
          },
-         {
-            label: "AI Chatbot",
-            Icon: RiRobot2Line,
-            href: "#",
-            description: "Conversational AI",
-         },
+
          {
             label: "Voice AI",
             Icon: FiPhone,
-            href: "#",
+            to: "/voice-ai",  // Voice AI landing page
             description: "AI calling agents",
             badge: "NEW",
          },
-         {
-            label: "Automations",
-            Icon: FiZap,
-            href: "#",
-            description: "Connect & integrate",
-         },
-         {
-            label: "Broadcast",
-            Icon: FiSend,
-            href: "#",
-            description: "Mass messaging",
-         },
-         {
-            label: "Shared Inbox",
-            Icon: FiBriefcase,
-            href: "#",
-            description: "Team collaboration",
-         },
-         {
-            label: "Contact CRM",
-            Icon: FiUsers,
-            href: "#",
-            description: "Manage customers",
-         },
-         {
-            label: "Analytics",
-            Icon: FiBarChart2,
-            href: "#",
-            description: "Track performance",
-         },
+
       ],
    },
-   {
-      id: "usecase",
-      title: "Use Cases",
-      items: [
-         { label: "Real Estate", Icon: FiHome, href: "#" },
-         { label: "Education", Icon: FiBookOpen, href: "#" },
-         { label: "Healthcare", Icon: FiHeart, href: "#" },
-         { label: "E-Commerce", Icon: FiShoppingCart, href: "#" },
-         { label: "Automobile", Icon: FiTruck, href: "#" },
-      ],
-   },
-   {
-      id: "company",
-      title: "Company",
-      items: [
-         { label: "About Us", href: "#" },
-         { label: "Contact", href: "#" },
-         { label: "Privacy Policy", to: "/privacy-policy" },
-         { label: "Terms of Service", to: "/terms-of-service" },
-      ],
-   },
+   // {
+   //    id: "usecase",
+   //    title: "Use Cases",
+   //    items: [
+   //       { label: "Real Estate", Icon: FiHome, href: "#" },
+   //       { label: "Education", Icon: FiBookOpen, href: "#" },
+   //       { label: "Healthcare", Icon: FiHeart, href: "#" },
+   //       { label: "E-Commerce", Icon: FiShoppingCart, href: "#" },
+   //       { label: "Automobile", Icon: FiTruck, href: "#" },
+   //    ],
+   // },
+   // {
+   //    id: "company",
+   //    title: "Company",
+   //    items: [
+   //       { label: "About Us", href: "#" },
+   //       { label: "Contact", href: "#" },
+   //       { label: "Privacy Policy", to: "/privacy-policy" },
+   //       { label: "Terms of Service", to: "/terms-of-service" },
+   //    ],
+   // },
 ];
 
 // ==================== SUB-COMPONENTS ====================
@@ -367,14 +333,15 @@ const Navbar = () => {
 
    // Pricing link based on current route
    const pricingHref = location.pathname === "/" ? "#pricing" : "/#pricing";
+   const useCaseHref = location.pathname === "/" ? "#usecases" : "/#usecases";
 
    return (
       <>
          {/* ==================== HEADER ==================== */}
          <header
             className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
-                  ? "border-b border-gray-200 bg-white/90 shadow-lg backdrop-blur-xl"
-                  : "bg-white/70 backdrop-blur-md"
+               ? "border-b border-gray-200 bg-white/90 shadow-lg backdrop-blur-xl"
+               : "bg-white/70 backdrop-blur-md"
                }`}
          >
             <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
@@ -394,6 +361,13 @@ const Navbar = () => {
                      <DesktopMenuItem key={section.id} section={section} />
                   ))}
 
+                    <a
+                     href={useCaseHref}
+                     className="font-medium text-gray-700 transition hover:text-green-600"
+                  >
+                     UseCases
+                  </a>
+
                   {/* Pricing Link */}
                   <a
                      href={pricingHref}
@@ -403,7 +377,7 @@ const Navbar = () => {
                   </a>
 
                   {/* Company Dropdown */}
-                  <DesktopMenuItem section={MENU_DATA[2]} />
+                  {/* <DesktopMenuItem section={MENU_DATA[2]} /> */}
                </nav>
 
                {/* Action Buttons */}
@@ -488,12 +462,12 @@ const Navbar = () => {
                            </a>
 
                            {/* Company Menu */}
-                           <MobileMenuItem
+                           {/* <MobileMenuItem
                               section={MENU_DATA[2]}
                               isOpen={openMenu === "company"}
                               onToggle={() => toggleSubMenu("company")}
                               onClose={closeMobileMenu}
-                           />
+                           /> */}
                         </div>
                      </div>
 
