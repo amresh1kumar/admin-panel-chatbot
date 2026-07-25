@@ -11,7 +11,8 @@ import {
    Space,
    Empty,
    Select,
-   Upload
+   Upload,
+   Checkbox
 } from "antd";
 import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import {
@@ -337,6 +338,14 @@ export default function BotMessage() {
                   label="Action (optional)"
                >
                   <Input placeholder="e.g., menu, services" />
+               </Form.Item>
+               <Form.Item
+                  name="isFlowEnd"
+                  valuePropName="checked"
+               >
+                  <Checkbox>
+                     Mark as Flow End
+                  </Checkbox>
                </Form.Item>
                <Form.Item name="templateName" label="Template (optional)">
                   <Select placeholder="Select template" allowClear onChange={handleTemplateChange}>
