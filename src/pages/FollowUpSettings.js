@@ -6,7 +6,8 @@ import {
    InputNumber,
    Button,
    message,
-   Spin
+   Spin,
+   Switch
 } from "antd";
 
 import {
@@ -44,7 +45,8 @@ export default function FollowUpSettings() {
             initialDelayHours:
                data.initialDelayHours,
             repeatEveryHours:
-               data.repeatEveryHours
+               data.repeatEveryHours,
+            enabled: data.enabled
          });
 
       } catch (err) {
@@ -102,12 +104,24 @@ export default function FollowUpSettings() {
 
             <Spin spinning={loading}>
 
+
+
                <Form
                   form={form}
                   layout="vertical"
                   onFinish={handleSubmit}
                >
 
+                  <Form.Item
+                     label="Enable Follow-up System"
+                     name="enabled"
+                     valuePropName="checked"
+                  >
+                     <Switch
+                        checkedChildren="ON"
+                        unCheckedChildren="OFF"
+                     />
+                  </Form.Item>
                   <Form.Item
                      label="Reminder Message"
                      name="message"
@@ -121,6 +135,7 @@ export default function FollowUpSettings() {
                   >
                      <TextArea
                         rows={5}
+                        disabled={!Form.useWatch("enabled", form)}
                         placeholder="Enter reminder message"
                      />
                   </Form.Item>
@@ -135,6 +150,7 @@ export default function FollowUpSettings() {
                      ]}
                   >
                      <InputNumber
+                        disabled={!Form.useWatch("enabled", form)}
                         min={0.01}
                         step={0.01}
 
@@ -154,6 +170,7 @@ export default function FollowUpSettings() {
                      ]}
                   >
                      <InputNumber
+                        disabled={!Form.useWatch("enabled", form)}
                         min={0.01}
                         step={0.01}
 

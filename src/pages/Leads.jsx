@@ -95,7 +95,7 @@ export default function Leads() {
          ),
       },
       {
-         title: "Contact",
+         title: "Phone",
          dataIndex: "phone",
          key: "phone",
          render: (phone, record) => (
