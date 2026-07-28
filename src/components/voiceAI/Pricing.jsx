@@ -177,7 +177,7 @@ const TrustBadge = ({ icon: Icon, text }) => (
 
 const Pricing = () => {
    return (
-      <section  className="relative overflow-hidden bg-gradient-to-b from-white via-gray-50 to-white py-20 lg:py-28">
+      <section  className="relative overflow-hidden bg-gradient-to-b from-white via-gray-50 to-white py-20 lg:py-10">
 
          {/* Background Decorations */}
          <div className="absolute inset-0 overflow-hidden">

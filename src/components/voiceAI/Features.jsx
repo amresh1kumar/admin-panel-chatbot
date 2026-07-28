@@ -228,14 +228,14 @@ const FeatureCard = ({ feature, index }) => {
          <div className={`absolute inset-0 bg-gradient-to-br ${feature.lightBg} opacity-0 transition-opacity duration-300 group-hover:opacity-100`}></div>
 
          {/* Coming Soon Badge */}
-         {feature.comingSoon && (
+         {/* {feature.comingSoon && (
             <div className="absolute right-4 top-4 z-10">
                <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 px-3 py-1 text-xs font-bold text-white shadow-lg">
                   <HiOutlineSparkles className="h-3 w-3" />
                   Coming Soon
                </span>
             </div>
-         )}
+         )} */}
 
          {/* Content */}
          <div className="relative z-10">
@@ -272,7 +272,7 @@ const FeatureCard = ({ feature, index }) => {
 
 const Features = () => {
    return (
-      <section className="relative overflow-hidden bg-gradient-to-b from-white via-gray-50 to-white py-20 lg:py-28">
+      <section className="relative overflow-hidden bg-gradient-to-b from-white via-gray-50 to-white py-20 lg:py-10">
 
          {/* Background Decorations */}
          <div className="absolute inset-0 overflow-hidden">

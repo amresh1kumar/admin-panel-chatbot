@@ -363,7 +363,7 @@ const WhyUsPoint = ({ point, index }) => {
 
 const WhyUs = () => {
    return (
-      <section className="relative overflow-hidden bg-gradient-to-b from-white via-gray-50 to-slate-50 py-24 lg:py-32">
+      <section className="relative overflow-hidden bg-gradient-to-b from-white via-gray-50 to-slate-50 py-24 lg:py-10">
          {/* Background Decorations */}
          <div className="absolute inset-0 overflow-hidden">
             <div className="absolute -left-20 top-1/4 h-96 w-96 rounded-full bg-blue-100 opacity-20 blur-3xl"></div>

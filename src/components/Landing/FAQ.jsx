@@ -367,7 +367,7 @@ const FAQ = () => {
    return (
       <section
          id="faq"
-         className="relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-blue-50 py-24 lg:py-32"
+         className="relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-blue-50 py-24 lg:py-10"
       >
          {/* Background Decorations */}
          <div className="absolute inset-0 overflow-hidden">

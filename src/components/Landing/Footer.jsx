@@ -203,7 +203,8 @@ import {
    FiShield,
    FiLogIn,
    FiUserPlus,
-   FiFacebook
+   FiFacebook,
+   FiPhone
 } from "react-icons/fi";
 import {
    RiWhatsappLine,
@@ -230,6 +231,7 @@ const FOOTER_LINKS = {
    contact: [
       { icon: FiMail, text: "spadvertising@live.com", href: "mailto:spadvertising@live.com" },
       { icon: FiGlobe, text: "https://spadvertising.in/", href: "https://www.spadvertising.tech" },
+      { icon: FiPhone, text: "+91-8085354646", href: "#" },
       { icon: FiMapPin, text: "Raipur, Chhattisgarh", href: "#" },
    ],
    social: [
@@ -387,7 +389,7 @@ const Footer = () => {
 
    return (
       <>
-         <footer className="relative bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 pt-16">
+         <footer className="relative bg-gradient-to-b from-slate-900  to-slate-900 pt-16">
 
             {/* Top Wave Effect */}
             <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-transparent to-slate-900/50"></div>

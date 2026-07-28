@@ -201,8 +201,9 @@
 // };
 
 // export default Hero;
-
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import DemoBookingModal from "../../common/DemoBookingModal";
 import {
    FiMessageCircle,
    FiSend,
@@ -224,6 +225,7 @@ import {
 import dashboardImage from "../../assets/images/Dashboard.png";
 
 // ==================== CONSTANTS ====================
+
 
 const FEATURES = [
    { icon: RiRobot2Line, label: "AI Chatbot" },
@@ -308,6 +310,8 @@ const FloatingCard = ({ position, label, value, icon: Icon, color }) => (
 // ==================== MAIN COMPONENT ====================
 
 const Hero = () => {
+   const [openDemoModal, setOpenDemoModal] = useState(false);
+
    return (
       <section className="relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-blue-50 py-16 lg:py-10">
 
@@ -362,13 +366,13 @@ const Hero = () => {
                      <FiArrowRight className="transition group-hover:translate-x-1" />
                   </Link>
 
-                  <Link
-                     to="/login"
+                  <button
+                     onClick={() => setOpenDemoModal(true)}
                      className="inline-flex items-center gap-2 rounded-xl border-2 border-blue-600 px-7 py-3.5 font-semibold text-blue-600 transition hover:bg-blue-600 hover:text-white"
                   >
                      Book Demo
                      <FiArrowRight />
-                  </Link>
+                  </button>
                </div>
 
                {/* Benefits */}
@@ -430,7 +434,10 @@ const Hero = () => {
           animation: float 3s ease-in-out infinite;
         }
       `}</style>
-
+         <DemoBookingModal
+            open={openDemoModal}
+            onClose={() => setOpenDemoModal(false)}
+         />
       </section>
    );
 };

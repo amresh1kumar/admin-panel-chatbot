@@ -17,7 +17,7 @@ const VoiceAI = () => {
          <UseCases/>
          <HowItWorks/>
          <DashboardPreview/>
-         <Pricing/>
+         {/* <Pricing/> */}
          <FAQ/>
          <Footer />
       </>

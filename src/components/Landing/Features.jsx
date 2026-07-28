@@ -300,7 +300,7 @@ const Features = () => {
    return (
       <section
          id="features"
-         className="relative overflow-hidden bg-gradient-to-b from-white via-gray-50 to-white py-20 lg:py-28"
+         className="relative overflow-hidden bg-gradient-to-b from-white via-gray-50 to-white py-20 lg:py-10"
       >
          {/* Background Decorations */}
          <div className="absolute inset-0 overflow-hidden">

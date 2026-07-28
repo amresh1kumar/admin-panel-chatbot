@@ -203,7 +203,7 @@ import dashboardMainImage from "../../assets/images/Dashboard.png";
 
 const DashboardPreview = () => {
    return (
-      <section className="relative overflow-hidden bg-gradient-to-b from-white via-gray-50 to-blue-50 py-24">
+      <section className="relative overflow-hidden bg-gradient-to-b from-white via-gray-50 to-blue-50 py-10">
          {/* Background Decorations */}
          <div className="absolute inset-0 overflow-hidden">
             <div className="absolute -left-20 top-1/4 h-96 w-96 rounded-full bg-blue-100 opacity-20 blur-3xl"></div>

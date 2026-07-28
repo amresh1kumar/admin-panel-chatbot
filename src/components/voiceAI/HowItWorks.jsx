@@ -268,7 +268,7 @@ const StepCard = ({ step, index }) => {
 
 const HowItWorks = () => {
    return (
-      <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 via-white to-gray-50 py-20 lg:py-28">
+      <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 via-white to-gray-50 py-20 lg:py-10">
 
          {/* Background Decorations */}
          <div className="absolute inset-0 overflow-hidden">

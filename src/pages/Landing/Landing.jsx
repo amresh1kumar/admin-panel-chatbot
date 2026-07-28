@@ -19,7 +19,7 @@ const Landing = () => {
          <HowItWorks />
          <DashboardPreview />
          <WhyUs />
-         <Pricing />
+         {/* <Pricing /> */}
          <FAQ />
          <Footer />
       </>

@@ -1,77 +1,3 @@
-// import logo from "../../assets/images/logo.png";
-// import { Link, useLocation } from "react-router-dom";
-
-// const Navbar = () => {
-//    const location = useLocation();
-//    return (
-//       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-200">
-//          <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
-
-//             {/* Logo */}
-//             <Link to="/">
-//                <img
-//                   src={logo}
-//                   alt="SP Advertising"
-//                   className="h-14 w-auto"
-//                />
-//             </Link>
-
-//             {/* Menu */}
-//             <nav className="hidden items-center gap-8 lg:flex">
-//                <a
-//                   href={location.pathname === "/" ? "#features" : "/#features"}
-//                   className="font-medium text-gray-700 transition hover:text-blue-600"
-//                >
-//                   Features
-//                </a>
-
-//                <a
-//                   href={location.pathname === "/" ? "#how-it-works" : "/#how-it-works"}
-//                   className="font-medium text-gray-700 transition hover:text-blue-600"
-//                >
-//                   How it Works
-//                </a>
-
-//                <a
-//                   href={location.pathname === "/" ? "#pricing" : "/#pricing"}
-//                   className="font-medium text-gray-700 transition hover:text-blue-600"
-//                >
-//                   Pricing
-//                </a>
-
-//                <a
-//                   href={location.pathname === "/" ? "#faq" : "/#faq"}
-//                   className="font-medium text-gray-700 transition hover:text-blue-600"
-//                >
-//                   FAQ
-//                </a>
-//             </nav>
-
-//             {/* Buttons */}
-//             <div className="flex items-center gap-4">
-
-//                <Link
-//                   to="/login"
-//                   className="hidden rounded-lg px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-100 md:block"
-//                >
-//                   Login
-//                </Link>
-
-//                <Link
-//                   to="/register"
-//                   className="rounded-lg bg-green-500 px-5 py-2.5 font-semibold text-white transition hover:bg-green-600"
-//                >
-//                   Start Free Trial
-//                </Link>
-
-//             </div>
-//          </div>
-//       </header>
-//    );
-// };
-
-// export default Navbar;
-
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -369,12 +295,12 @@ const Navbar = () => {
                   </a>
 
                   {/* Pricing Link */}
-                  <a
+                  {/* <a
                      href={pricingHref}
                      className="font-medium text-gray-700 transition hover:text-green-600"
                   >
                      Pricing
-                  </a>
+                  </a> */}
 
                   {/* Company Dropdown */}
                   {/* <DesktopMenuItem section={MENU_DATA[2]} /> */}

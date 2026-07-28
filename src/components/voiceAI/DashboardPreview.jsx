@@ -43,7 +43,7 @@ const cards = [
 
 const DashboardPreview = () => {
    return (
-      <section className="py-20 bg-gray-50">
+      <section className="py-10 bg-gray-50">
          <div className="max-w-7xl mx-auto px-6 lg:px-8">
 
             {/* Heading */}
