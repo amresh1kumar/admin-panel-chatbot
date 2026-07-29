@@ -100,13 +100,13 @@ export default function Dashboard() {
                   color="#faad14"
                />
 
-               <StatsCard
+               {/* <StatsCard
                   title="Growth Rate"
                   value={`${data?.growth || 0}%`}
                   icon={<RiseOutlined />}
                   color="#722ed1"
                   trend={{ value: data?.growth || 0, isUp: true }}
-               />
+               /> */}
 
                <StatsCard
                   title="Today's Leads"
