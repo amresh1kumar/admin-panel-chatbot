@@ -244,6 +244,26 @@ export default function ChatWindow({ user }) {
       }
    };
 
+   const formatDateLabel = (date) => {
+      const d = new Date(date);
+
+      const today = new Date();
+      const yesterday = new Date();
+      yesterday.setDate(today.getDate() - 1);
+
+      if (d.toDateString() === today.toDateString()) return "Today";
+      if (d.toDateString() === yesterday.toDateString()) return "Yesterday";
+
+      return d.toLocaleDateString("en-IN", {
+         day: "numeric",
+         month: "long",
+         year:
+            d.getFullYear() !== today.getFullYear()
+               ? "numeric"
+               : undefined,
+      });
+   };
+
    if (!user) {
       return (
          <div className="chat-empty-state">
@@ -321,7 +341,7 @@ export default function ChatWindow({ user }) {
                </div>
             )}
 
-            {!loading &&
+            {/* {!loading &&
                (messages || []).map((msg) => (
                   <div
                      key={msg._id}
@@ -352,7 +372,60 @@ export default function ChatWindow({ user }) {
                         </div>
                      </div>
                   </div>
-               ))}
+               ))} */}
+
+            {!loading &&
+               (messages || []).map((msg, index) => {
+                  const currentDate = new Date(msg.createdAt).toDateString();
+
+                  const prevDate =
+                     index > 0
+                        ? new Date(messages[index - 1].createdAt).toDateString()
+                        : null;
+
+                  const showDate = currentDate !== prevDate;
+
+                  return (
+                     <div key={msg._id}>
+                        {showDate && (
+                           <div className="chat-date-divider">
+                              <span>{formatDateLabel(msg.createdAt)}</span>
+                           </div>
+                        )}
+
+                        <div
+                           className={`message-wrapper ${msg.type === "user" ? "user" : "bot"
+                              }`}
+                        >
+                           <div
+                              className={`message-bubble ${msg.type === "user" ? "user" : "bot"
+                                 }`}
+                           >
+                              <div className="message-text">{msg.message}</div>
+
+                              <div className="message-meta">
+                                 <span className="message-time">
+                                    {msg.createdAt
+                                       ? new Date(msg.createdAt).toLocaleTimeString([], {
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                       })
+                                       : "--"}
+                                 </span>
+
+                                 {msg.type === "bot" && (
+                                    <span className="message-status">
+                                       {msg.status === "sent" && "✓"}
+                                       {msg.status === "delivered" && "✓✓"}
+                                       {msg.status === "read" && "✓✓"}
+                                    </span>
+                                 )}
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  );
+               })}
 
             <div ref={bottomRef}></div>
          </div>
