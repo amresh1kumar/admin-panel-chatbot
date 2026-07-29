@@ -173,18 +173,31 @@
 .user-info-top {
    display: flex;
    justify-content: space-between;
-   align-items: center;
+   align-items: flex-start;
+   gap: 10px;
    margin-bottom: 4px;
+}
+.user-details {
+   flex: 1;
+   min-width: 0;
 }
 
 .user-name {
-   font-weight: 500;
-   font-size: 16px;
+   font-size: 15px;
+   font-weight: 600;
    color: #111b21;
    overflow: hidden;
    text-overflow: ellipsis;
    white-space: nowrap;
-   transition: color 0.2s ease;
+}
+
+.user-phone {
+   font-size: 12px;
+   color: #667781;
+   margin-top: 2px;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
 }
 
 .user-item.active .user-name {
@@ -192,11 +205,11 @@
 }
 
 .user-timestamp {
-   font-size: 12px;
+   flex-shrink: 0;
+   font-size: 11px;
    color: #667781;
-   margin-left: 8px;
    white-space: nowrap;
-   transition: color 0.2s ease;
+   margin-top: 2px;
 }
 
 .user-item.active .user-timestamp {

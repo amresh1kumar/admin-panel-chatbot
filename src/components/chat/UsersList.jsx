@@ -19,8 +19,10 @@ export default function UsersList({ onSelectUser }) {
          .catch(err => console.error(err));
    }, [tenantId]);
 
-   const filteredUsers = (users || []).filter(user =>
-      (user._id || "").toLowerCase().includes(searchQuery.toLowerCase())
+   const filteredUsers = (users || []).filter(
+      (user) =>
+         (user.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+         (user._id || "").includes(searchQuery)
    );
 
    const formatChatTime = (date) => {
@@ -104,9 +106,16 @@ export default function UsersList({ onSelectUser }) {
 
                   <div className="user-info">
                      <div className="user-info-top">
-                        <div className="user-name">
-                           {user._id.slice(0, 12)}
+                        <div className="user-details">
+                           <div className="user-name">
+                              {user.name?.trim() || "Unknown"}
+                           </div>
+
+                           <div className="user-phone">
+                              {user._id}
+                           </div>
                         </div>
+
                         <div className="user-timestamp">
                            {formatChatTime(user.lastMessageTime || user.updatedAt || user.createdAt)}
                         </div>

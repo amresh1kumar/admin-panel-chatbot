@@ -33,7 +33,8 @@ export default function ChatWindow({ user }) {
    const [selectedTemplate, setSelectedTemplate] = useState(null);
    const [params, setParams] = useState([]);
    const [mediaUrl, setMediaUrl] = useState("");
-   const [conversation, setConversation] = useState({ mode: "bot", takenBy: null, });
+   const [conversation, setConversation] = useState({ name: "", mode: "bot", takenBy: null, });
+
 
    const bottomRef = useRef(null);
 
@@ -48,6 +49,7 @@ export default function ChatWindow({ user }) {
          setMessages(data.chats || []);
          setConversation(
             data.conversation || {
+               name: "",
                mode: "bot",
                takenBy: null,
             }
@@ -286,7 +288,14 @@ export default function ChatWindow({ user }) {
                   <UserOutlined className="avatar-icon" />
                </div>
                <div className="chat-user-info">
-                  <h3 className="chat-user-name">{user}</h3>
+
+                  <h3 className="chat-user-name">
+                     {conversation?.name?.trim() ? conversation.name.trim() : "Unknown"}
+                  </h3>
+
+                  <span className="chat-user-phone">
+                     {user}
+                  </span>
                </div>
                <div >
                   {conversation.mode === "bot" ? (
