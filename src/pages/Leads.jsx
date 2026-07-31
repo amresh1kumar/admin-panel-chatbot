@@ -38,12 +38,23 @@ export default function Leads() {
          .finally(() => setLoading(false));
    }, []);
 
-   const filteredLeads = leads.filter(
-      (lead) =>
-         lead.name?.toLowerCase().includes(searchText.toLowerCase()) ||
-         lead.phone?.includes(searchText) ||
-         lead.business?.toLowerCase().includes(searchText.toLowerCase()),
-   );
+   // const filteredLeads = leads.filter(
+   //    (lead) =>
+   //       lead.name?.toLowerCase().includes(searchText.toLowerCase()) ||
+   //       lead.phone?.includes(searchText) ||
+   //       lead.business?.toLowerCase().includes(searchText.toLowerCase()),
+   // );
+
+   const filteredLeads = leads.filter((lead) => {
+      const search = searchText.toLowerCase();
+
+      return (
+         lead.name?.toLowerCase().includes(search) ||
+         lead.profileName?.toLowerCase().includes(search) ||
+         lead.phone?.includes(search) ||
+         lead.business?.toLowerCase().includes(search)
+      );
+   });
 
    const handleDelete = async (id) => {
       try {
@@ -82,27 +93,68 @@ export default function Leads() {
 
    const columns = [
       {
-         title: "Name",
+         title: "Customer Name",
          dataIndex: "name",
          key: "name",
+         width: 180,
          render: (text) => (
-            <div className="lead-name-cell">
+            <div
+               style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+               }}
+            >
                <div className="lead-avatar">
-                  {text?.charAt(0).toUpperCase() || "?"}
+                  {((text || selectedLead?.profileName || "?")
+                     .charAt(0)
+                     .toUpperCase())}
+
                </div>
-               <span className="lead-name">{text || "N/A"}</span>
+
+               <span
+                  title={text || "Unknown"}
+                  style={{
+                     flex: 1,
+                     overflow: "hidden",
+                     textOverflow: "ellipsis",
+                     whiteSpace: "nowrap",
+                  }}
+               >
+                  {text || "Unknown"}
+               </span>
             </div>
          ),
       },
       {
-         title: "Phone",
+         title: "WhatsApp Name",
+         dataIndex: "profileName",
+         key: "profileName",
+         width: 180,
+         render: (text) => (
+            <span
+               title={text || "Unknown"}
+               style={{
+                  display: "block",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+               }}
+            >
+               {text || "Unknown"}
+            </span>
+         ),
+      },
+      {
+         title: "WhatsApp Number",
          dataIndex: "phone",
          key: "phone",
+         width: 170,
          render: (phone, record) => (
             <div className="contact-cell">
                <div className="contact-item">
                   <WhatsAppOutlined className="contact-icon" style={{ fontSize: '14px' }} />
-                  <span>{phone || "N/A"}</span>
+                  <span>{phone || "-"}</span>
                </div>
                {record.email && (
                   <div className="contact-item">
@@ -114,19 +166,26 @@ export default function Leads() {
          ),
       },
 
-      {
-         title: "Form Contact",
-         dataIndex: "userPhone",
-         key: "userPhone",
-         render: (text) => <span className="business-text">{text || "N/A"}</span>,
-      },
+
       {
          title: "Requirement",
          dataIndex: "requirement",
          key: "requirement",
+         width: 180,
          render: (text) => (
-            <Tag color="blue" className="requirement-tag">
-               {text || "N/A"}
+            <Tag
+               color="blue"
+               title={text || "-"}
+               style={{
+                  maxWidth: "100%",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  display: "inline-block",
+                  verticalAlign: "middle",
+               }}
+            >
+               {text || "-"}
             </Tag>
          ),
       },
@@ -134,6 +193,7 @@ export default function Leads() {
          title: "Date",
          dataIndex: "createdAt",
          key: "createdAt",
+         width: 130,
          render: (date) => (
             <div className="date-cell">
                <CalendarOutlined className="date-icon" />
@@ -144,7 +204,7 @@ export default function Leads() {
                         month: "short",
                         year: "numeric",
                      })
-                     : "N/A"}
+                     : "-"}
                </span>
             </div>
          ),
@@ -152,6 +212,7 @@ export default function Leads() {
       {
          title: "Action",
          key: "action",
+         width: 150,
          render: (_, record) => (
             <Space>
                <Button
@@ -223,7 +284,7 @@ export default function Leads() {
 
          <div className="leads-filters">
             <Input
-               placeholder="Search by name, phone, or business..."
+               placeholder="Search by customer, WhatsApp name or phone..."
                prefix={<SearchOutlined />}
                value={searchText}
                onChange={(e) => setSearchText(e.target.value)}
@@ -249,6 +310,9 @@ export default function Leads() {
                rowKey="_id"
                scroll={{ x: 'max-content' }}
                loading={loading}
+               tableLayout="fixed"
+               scroll={{ x: 1000 }}
+
                pagination={{
                   pageSize: 10,
                   showTotal: (total) => `Total ${total} leads`,
@@ -274,25 +338,23 @@ export default function Leads() {
             }}
          >
             {selectedLead && (
+
                <Descriptions bordered column={1} size="small">
+                  <Descriptions.Item label="Customer Name">
+                     {selectedLead.name || "Unknown"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="WhatsApp Name">
+                     {selectedLead.profileName || "-"}
+                  </Descriptions.Item>
                   <Descriptions.Item label="WhatsApp Number">
-                     {selectedLead.phone || "N/A"}
+                     {selectedLead.phone || "-"}
                   </Descriptions.Item>
-
-                  <Descriptions.Item label="Form Contact">
-                     {selectedLead.userPhone || "N/A"}
-                  </Descriptions.Item>
-
-                  <Descriptions.Item label="Name">
-                     {selectedLead.name || "N/A"}
-                  </Descriptions.Item>
-
                   <Descriptions.Item label="Business">
-                     {selectedLead.business || "N/A"}
+                     {selectedLead.business || "-"}
                   </Descriptions.Item>
 
                   <Descriptions.Item label="Requirement">
-                     {selectedLead.requirement || "N/A"}
+                     {selectedLead.requirement || "-"}
                   </Descriptions.Item>
 
                   {selectedLead.extraData &&
