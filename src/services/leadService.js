@@ -20,6 +20,44 @@ export const deleteLead = async (id) => {
    }
 };
 
+export const exportLeads = async () => {
+
+   try {
+
+      const res = await API.get(
+         "/leads/export",
+         {
+            responseType: "blob"
+         }
+      );
+
+      return res.data;
+
+   } catch (err) {
+
+      console.error(
+         "Export Leads Error:",
+         err.response?.data ||
+         err.message
+      );
+
+      throw err;
+   }
+};
+
+export const updateLead = async (id, data) => {
+   try {
+      const res = await API.put(`/leads/${id}`, data);
+      return res.data;
+   } catch (err) {
+      console.error(
+         "Update Lead Error:",
+         err.response?.data || err.message
+      );
+      throw err;
+   }
+};
+
 export const deleteMultipleLeads = async (ids) => {
    try {
       const res = await API.post("/leads/delete-multiple", { ids });
@@ -50,27 +88,4 @@ export const addLeadNote = async (id, text) => {
    }
 };
 
-export const exportLeads = async () => {
 
-   try {
-
-      const res = await API.get(
-         "/leads/export",
-         {
-            responseType: "blob"
-         }
-      );
-
-      return res.data;
-
-   } catch (err) {
-
-      console.error(
-         "Export Leads Error:",
-         err.response?.data ||
-         err.message
-      );
-
-      throw err;
-   }
-};

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-
-import { getLeads, deleteLead } from "../services/leadService";
+import { getLeads, deleteLead, updateLead } from "../services/leadService";
 // import dayjs from "dayjs";
 import {
    Table,
@@ -11,16 +10,22 @@ import {
    Popconfirm,
    Modal,
    Descriptions,
+   Form,
+   message,
+   Tooltip
 } from "antd";
 import {
    SearchOutlined,
    WhatsAppOutlined,
    MailOutlined,
    CalendarOutlined,
+   DownloadOutlined,
+   EyeOutlined,
+   EditOutlined,
+   DeleteOutlined,
 } from "@ant-design/icons";
 import "../styles/Leads.css";
 import { exportLeads } from "../services/leadService";
-import { DownloadOutlined } from "@ant-design/icons";
 
 export default function Leads() {
    const [leads, setLeads] = useState([]);
@@ -28,6 +33,9 @@ export default function Leads() {
    const [searchText, setSearchText] = useState("");
    const [detailsOpen, setDetailsOpen] = useState(false);
    const [selectedLead, setSelectedLead] = useState(null);
+   const [editOpen, setEditOpen] = useState(false);
+
+   const [form] = Form.useForm();
 
    useEffect(() => {
       setLoading(true);
@@ -91,6 +99,59 @@ export default function Leads() {
       }
    };
 
+
+   const handleUpdateLead = async (values) => {
+      try {
+         const payload = {
+            name: values.name,
+            business: values.business,
+            requirement: values.requirement,
+            extraData: {
+               ...(selectedLead?.extraData || {}),
+            },
+         };
+
+         // Dynamic Fields
+         Object.keys(values).forEach((key) => {
+            if (
+               ![
+                  "name",
+                  "profileName",
+                  "business",
+                  "requirement",
+               ].includes(key)
+            ) {
+               payload.extraData[key] = values[key];
+            }
+         });
+
+         const res = await updateLead(
+            selectedLead._id,
+            payload
+         );
+
+         setLeads((prev) =>
+            prev.map((lead) =>
+               lead._id === selectedLead._id
+                  ? res.lead
+                  : lead
+            )
+         );
+
+         setSelectedLead(res.lead);
+
+         message.success("Lead updated successfully");
+
+         setEditOpen(false);
+         form.resetFields();
+         setSelectedLead(null);
+
+      } catch (err) {
+         console.error(err);
+         message.error("Failed to update lead");
+      }
+   };
+
    const columns = [
       {
          title: "Customer Name",
@@ -98,32 +159,17 @@ export default function Leads() {
          key: "name",
          width: 180,
          render: (text) => (
-            <div
+            <span
+               title={text || "Unknown"}
                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
+                  display: "block",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
                }}
             >
-               <div className="lead-avatar">
-                  {((text || selectedLead?.profileName || "?")
-                     .charAt(0)
-                     .toUpperCase())}
-
-               </div>
-
-               <span
-                  title={text || "Unknown"}
-                  style={{
-                     flex: 1,
-                     overflow: "hidden",
-                     textOverflow: "ellipsis",
-                     whiteSpace: "nowrap",
-                  }}
-               >
-                  {text || "Unknown"}
-               </span>
-            </div>
+               {text || "Unknown"}
+            </span>
          ),
       },
       {
@@ -214,25 +260,53 @@ export default function Leads() {
          key: "action",
          width: 150,
          render: (_, record) => (
-            <Space>
-               <Button
-                  size="small"
-                  type="primary"
-                  onClick={() => {
-                     setSelectedLead(record);
-                     setDetailsOpen(true);
-                  }}
-               >
-                  Details
-               </Button>
+            <Space size="small">
+               <Tooltip title="Details">
+                  <Button
+                     type="text"
+                     icon={<EyeOutlined />}
+                     title="View Details"
+                     onClick={() => {
+                        setSelectedLead(record);
+                        setDetailsOpen(true);
+                     }}
+                  />
+               </Tooltip>
+               <Tooltip title="Edit">
+
+                  <Button
+                     type="text"
+                     icon={<EditOutlined />}
+                     title="Edit Lead"
+                     onClick={() => {
+                        setSelectedLead(record);
+
+                        form.setFieldsValue({
+                           name: record.name,
+                           profileName: record.profileName,
+                           business: record.business,
+                           requirement: record.requirement,
+                           ...(record.extraData || {}),
+                        });
+
+                        setEditOpen(true);
+                     }}
+                  />
+               </Tooltip>
+
 
                <Popconfirm
                   title="Are you sure delete this lead?"
                   onConfirm={() => handleDelete(record._id)}
                >
-                  <Button danger size="small">
-                     Delete
-                  </Button>
+                  <Tooltip title="Delete">
+                     <Button
+                        type="text"
+                        danger
+                        icon={<DeleteOutlined />}
+                        title="Delete Lead"
+                     />
+                  </Tooltip>
                </Popconfirm>
             </Space>
          ),
@@ -308,7 +382,6 @@ export default function Leads() {
                columns={columns}
                dataSource={filteredLeads}
                rowKey="_id"
-               scroll={{ x: 'max-content' }}
                loading={loading}
                tableLayout="fixed"
                scroll={{ x: 1000 }}
@@ -327,7 +400,10 @@ export default function Leads() {
          <Modal
             open={detailsOpen}
             footer={null}
-            onCancel={() => setDetailsOpen(false)}
+            onCancel={() => {
+               setDetailsOpen(false);
+               setSelectedLead(null);
+            }}
             title="Lead Details"
             width={700}
             styles={{
@@ -374,6 +450,71 @@ export default function Leads() {
 
          </Modal>
 
+         <Modal
+            title="Edit Lead"
+            open={editOpen}
+            onCancel={() => {
+               setEditOpen(false);
+               form.resetFields();
+               setSelectedLead(null);
+            }}
+            onOk={() => form.submit()}
+            okText="Save"
+         >
+            <Form
+               form={form}
+               layout="vertical"
+               onFinish={handleUpdateLead}
+            >
+               <Form.Item
+                  label="Customer Name"
+                  name="name"
+               >
+                  <Input />
+               </Form.Item>
+
+               <Form.Item
+                  label="WhatsApp Name"
+                  name="profileName"
+               >
+                  <Input
+                     value={selectedLead?.profileName}
+                     disabled
+                  />
+               </Form.Item>
+
+               <Form.Item label="Business" name="business">
+                  <Input />
+               </Form.Item>
+
+               <Form.Item
+                  label="Requirement"
+                  name="requirement"
+               >
+                  <Input />
+               </Form.Item>
+
+               <Form.Item label="WhatsApp Number">
+                  <Input
+                     value={selectedLead?.phone}
+                     disabled
+                  />
+               </Form.Item>
+
+               {selectedLead?.extraData &&
+                  Object.entries(selectedLead.extraData).map(([key, value]) => (
+                     <Form.Item
+                        key={key}
+                        label={key
+                           .replace(/([A-Z])/g, " $1")
+                           .replace(/^./, (s) => s.toUpperCase())}
+                        name={key}
+                     >
+                        <Input />
+                     </Form.Item>
+                  ))}
+            </Form>
+         </Modal>
       </div>
    );
 }
