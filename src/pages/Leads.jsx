@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getLeads, deleteLead, updateLead } from "../services/leadService";
-// import dayjs from "dayjs";
+import dayjs from "dayjs";
 import {
    Table,
    Tag,
@@ -12,7 +12,8 @@ import {
    Descriptions,
    Form,
    message,
-   Tooltip
+   Tooltip,
+   DatePicker,
 } from "antd";
 import {
    SearchOutlined,
@@ -25,33 +26,48 @@ import {
    DeleteOutlined,
 } from "@ant-design/icons";
 import "../styles/Leads.css";
-import { exportLeads } from "../services/leadService";
+import { exportLeads, exportLeadContacts } from "../services/leadService";
 
 export default function Leads() {
    const [leads, setLeads] = useState([]);
    const [loading, setLoading] = useState(false);
    const [searchText, setSearchText] = useState("");
    const [detailsOpen, setDetailsOpen] = useState(false);
+   const [fromDate, setFromDate] = useState("");
+   const [toDate, setToDate] = useState("");
    const [selectedLead, setSelectedLead] = useState(null);
    const [editOpen, setEditOpen] = useState(false);
 
    const [form] = Form.useForm();
 
+   // useEffect(() => {
+   //    setLoading(true);
+
+   //    getLeads()
+   //       .then((data) => setLeads(data || []))
+   //       .catch((err) => console.error(err))
+   //       .finally(() => setLoading(false));
+   // }, []);
+
    useEffect(() => {
       setLoading(true);
 
-      getLeads()
+      const params = {};
+
+      if (fromDate) {
+         params.fromDate = `${fromDate}T00:00:00+05:30`;
+      }
+
+      if (toDate) {
+         params.toDate = `${toDate}T23:59:59.999+05:30`;
+      }
+
+      getLeads(params)
          .then((data) => setLeads(data || []))
          .catch((err) => console.error(err))
          .finally(() => setLoading(false));
-   }, []);
+   }, [fromDate, toDate]);
 
-   // const filteredLeads = leads.filter(
-   //    (lead) =>
-   //       lead.name?.toLowerCase().includes(searchText.toLowerCase()) ||
-   //       lead.phone?.includes(searchText) ||
-   //       lead.business?.toLowerCase().includes(searchText.toLowerCase()),
-   // );
 
    const filteredLeads = leads.filter((lead) => {
       const search = searchText.toLowerCase();
@@ -73,19 +89,50 @@ export default function Leads() {
       }
    };
 
-
    const handleExport = async () => {
       try {
+         const params = {};
+         if (fromDate) {
+            params.fromDate = `${fromDate}T00:00:00+05:30`;
+         }
+         if (toDate) {
+            params.toDate = `${toDate}T23:59:59.999+05:30`;
+         }
+         const blob = await exportLeads(params);
+         const url = window.URL.createObjectURL(blob);
+         const link = document.createElement("a");
+         link.href = url;
+         link.download = "leads-details.xlsx";
+         document.body.appendChild(link);
+         link.click();
+         link.remove();
+         window.URL.revokeObjectURL(url);
+      } catch (err) {
+         console.error(err);
+      }
+   };
 
-         const blob = await exportLeads();
+
+   const handleContactExport = async () => {
+      try {
+         const params = {};
+
+         if (fromDate) {
+            params.fromDate = `${fromDate}T00:00:00+05:30`;
+         }
+
+         if (toDate) {
+            params.toDate = `${toDate}T23:59:59.999+05:30`;
+         }
+
+         const blob = await exportLeadContacts(params);
 
          const url = window.URL.createObjectURL(blob);
 
          const link = document.createElement("a");
 
          link.href = url;
-
-         link.download = "leads.xlsx";
+         link.download = "leads-contact.xlsx";
 
          document.body.appendChild(link);
 
@@ -93,8 +140,9 @@ export default function Leads() {
 
          link.remove();
 
-      } catch (err) {
+         window.URL.revokeObjectURL(url);
 
+      } catch (err) {
          console.error(err);
       }
    };
@@ -113,29 +161,15 @@ export default function Leads() {
 
          // Dynamic Fields
          Object.keys(values).forEach((key) => {
-            if (
-               ![
-                  "name",
-                  "profileName",
-                  "business",
-                  "requirement",
-               ].includes(key)
-            ) {
+            if (!["name", "profileName", "business", "requirement"].includes(key)) {
                payload.extraData[key] = values[key];
             }
          });
 
-         const res = await updateLead(
-            selectedLead._id,
-            payload
-         );
+         const res = await updateLead(selectedLead._id, payload);
 
          setLeads((prev) =>
-            prev.map((lead) =>
-               lead._id === selectedLead._id
-                  ? res.lead
-                  : lead
-            )
+            prev.map((lead) => (lead._id === selectedLead._id ? res.lead : lead)),
          );
 
          setSelectedLead(res.lead);
@@ -145,7 +179,6 @@ export default function Leads() {
          setEditOpen(false);
          form.resetFields();
          setSelectedLead(null);
-
       } catch (err) {
          console.error(err);
          message.error("Failed to update lead");
@@ -199,7 +232,10 @@ export default function Leads() {
          render: (phone, record) => (
             <div className="contact-cell">
                <div className="contact-item">
-                  <WhatsAppOutlined className="contact-icon" style={{ fontSize: '14px' }} />
+                  <WhatsAppOutlined
+                     className="contact-icon"
+                     style={{ fontSize: "14px" }}
+                  />
                   <span>{phone || "-"}</span>
                </div>
                {record.email && (
@@ -211,7 +247,6 @@ export default function Leads() {
             </div>
          ),
       },
-
 
       {
          title: "Requirement",
@@ -273,7 +308,6 @@ export default function Leads() {
                   />
                </Tooltip>
                <Tooltip title="Edit">
-
                   <Button
                      type="text"
                      icon={<EditOutlined />}
@@ -293,7 +327,6 @@ export default function Leads() {
                      }}
                   />
                </Tooltip>
-
 
                <Popconfirm
                   title="Are you sure delete this lead?"
@@ -315,12 +348,6 @@ export default function Leads() {
 
    return (
       <div className="leads-container">
-         {/* <div className="leads-header">
-            <div className="leads-header-left">
-               <h1 className="leads-title">Leads</h1>
-               <p className="leads-subtitle">Manage and track your leads</p>
-            </div>
-         </div> */}
 
          <div className="leads-stats">
             <div className="stat-card">
@@ -352,8 +379,6 @@ export default function Leads() {
                </div>
                <div className="stat-label">This Week</div>
             </div>
-
-
          </div>
 
          <div className="leads-filters">
@@ -362,8 +387,26 @@ export default function Leads() {
                prefix={<SearchOutlined />}
                value={searchText}
                onChange={(e) => setSearchText(e.target.value)}
-               className="search-input"
+               className="search-input-lead"
                allowClear
+            />
+
+            <DatePicker
+               format="DD/MM/YYYY"
+               placeholder="From Date"
+               value={fromDate ? dayjs(fromDate) : null}
+               onChange={(date) => {
+                  setFromDate(date ? date.format("YYYY-MM-DD") : "");
+               }}
+            />
+
+            <DatePicker
+               format="DD/MM/YYYY"
+               placeholder="To Date"
+               value={toDate ? dayjs(toDate) : null}
+               onChange={(date) => {
+                  setToDate(date ? date.format("YYYY-MM-DD") : "");
+               }}
             />
 
             <Button
@@ -371,9 +414,15 @@ export default function Leads() {
                icon={<DownloadOutlined />}
                onClick={handleExport}
             >
-               Export
+               Export All Details
             </Button>
-
+            <Button
+               type="primary"
+               icon={<DownloadOutlined />}
+               onClick={handleContactExport}
+            >
+               Export Contacts
+            </Button>
          </div>
 
          {/* Table */}
@@ -385,7 +434,6 @@ export default function Leads() {
                loading={loading}
                tableLayout="fixed"
                scroll={{ x: 1000 }}
-
                pagination={{
                   pageSize: 10,
                   showTotal: (total) => `Total ${total} leads`,
@@ -414,7 +462,6 @@ export default function Leads() {
             }}
          >
             {selectedLead && (
-
                <Descriptions bordered column={1} size="small">
                   <Descriptions.Item label="Customer Name">
                      {selectedLead.name || "Unknown"}
@@ -446,8 +493,6 @@ export default function Leads() {
                      ))}
                </Descriptions>
             )}
-
-
          </Modal>
 
          <Modal
@@ -461,44 +506,25 @@ export default function Leads() {
             onOk={() => form.submit()}
             okText="Save"
          >
-            <Form
-               form={form}
-               layout="vertical"
-               onFinish={handleUpdateLead}
-            >
-               <Form.Item
-                  label="Customer Name"
-                  name="name"
-               >
+            <Form form={form} layout="vertical" onFinish={handleUpdateLead}>
+               <Form.Item label="Customer Name" name="name">
                   <Input />
                </Form.Item>
 
-               <Form.Item
-                  label="WhatsApp Name"
-                  name="profileName"
-               >
-                  <Input
-                     value={selectedLead?.profileName}
-                     disabled
-                  />
+               <Form.Item label="WhatsApp Name" name="profileName">
+                  <Input value={selectedLead?.profileName} disabled />
                </Form.Item>
 
                <Form.Item label="Business" name="business">
                   <Input />
                </Form.Item>
 
-               <Form.Item
-                  label="Requirement"
-                  name="requirement"
-               >
+               <Form.Item label="Requirement" name="requirement">
                   <Input />
                </Form.Item>
 
                <Form.Item label="WhatsApp Number">
-                  <Input
-                     value={selectedLead?.phone}
-                     disabled
-                  />
+                  <Input value={selectedLead?.phone} disabled />
                </Form.Item>
 
                {selectedLead?.extraData &&

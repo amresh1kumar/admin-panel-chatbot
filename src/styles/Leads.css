@@ -144,14 +144,23 @@
    animation: fadeIn 0.4s ease;
    position: relative;
    z-index: 1;
+   /* border: 1px solid red; */
 }
 
-.search-input {
+.search-input-lead {
    flex: 1;
    max-width: 400px;
-   height: 40px;
+   /* height: 40px; */
    border-radius: 10px;
    font-size: 13px;
+   border: 1px solid rgba(128, 128, 128, 0.185);
+   padding: 0px 12px 0px 15px;
+   border-radius: 8px;
+   background: transparent;
+   outline: none;
+   color: #111b21;
+   transition: all 0.3s ease;
+
 }
 
 .search-input .ant-input {

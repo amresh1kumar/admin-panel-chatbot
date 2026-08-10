@@ -1,8 +1,11 @@
 import API from "../api/api";
 
-export const getLeads = async () => {
+export const getLeads = async (params = {}) => {
    try {
-      const res = await API.get("/leads");
+      const res = await API.get("/leads", {
+         params,
+      });
+
       return res.data;
    } catch (err) {
       console.error("Get Leads Error:", err.response?.data || err.message);
@@ -20,25 +23,33 @@ export const deleteLead = async (id) => {
    }
 };
 
-export const exportLeads = async () => {
-
+export const exportLeads = async (params = {}) => {
    try {
-
-      const res = await API.get(
-         "/leads/export",
-         {
-            responseType: "blob"
-         }
-      );
+      const res = await API.get("/leads/export", {
+         params,
+         responseType: "blob",
+      });
 
       return res.data;
-
    } catch (err) {
+      console.error("Export Leads Error:", err.response?.data || err.message);
 
+      throw err;
+   }
+};
+
+export const exportLeadContacts = async (params = {}) => {
+   try {
+      const res = await API.get("/leads/export-contacts", {
+         params,
+         responseType: "blob",
+      });
+
+      return res.data;
+   } catch (err) {
       console.error(
-         "Export Leads Error:",
-         err.response?.data ||
-         err.message
+         "Export Lead Contacts Error:",
+         err.response?.data || err.message,
       );
 
       throw err;
@@ -50,10 +61,7 @@ export const updateLead = async (id, data) => {
       const res = await API.put(`/leads/${id}`, data);
       return res.data;
    } catch (err) {
-      console.error(
-         "Update Lead Error:",
-         err.response?.data || err.message
-      );
+      console.error("Update Lead Error:", err.response?.data || err.message);
       throw err;
    }
 };
@@ -63,7 +71,10 @@ export const deleteMultipleLeads = async (ids) => {
       const res = await API.post("/leads/delete-multiple", { ids });
       return res.data;
    } catch (err) {
-      console.error("Delete Multiple Leads Error:", err.response?.data || err.message);
+      console.error(
+         "Delete Multiple Leads Error:",
+         err.response?.data || err.message,
+      );
       throw err;
    }
 };
@@ -87,5 +98,3 @@ export const addLeadNote = async (id, text) => {
       throw err;
    }
 };
-
-
