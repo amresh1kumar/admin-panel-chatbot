@@ -42,6 +42,24 @@ export const clearChat = async (phone) => {
    }
 };
 
+export const clearSelectedChats = async (phones) => {
+
+   try {
+      const res = await API.delete("/chats/clear-selected", {
+         data: {
+            phones
+         }
+      });
+
+      return res.data;
+   } catch (err) {
+
+      console.errror("Clear Selected Chats Error : ", err.response?.data || err.message);
+      throw err;
+   }
+
+}
+
 export const sendTemplateMessage = async (
    to,
    templateName,
