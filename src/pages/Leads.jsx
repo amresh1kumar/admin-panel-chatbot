@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getLeads, deleteLead, updateLead } from "../services/leadService";
+import { getLeads, deleteLead, updateLead, deleteMultipleLeads } from "../services/leadService";
 import dayjs from "dayjs";
 import {
    Table,
@@ -36,6 +36,7 @@ export default function Leads() {
    const [fromDate, setFromDate] = useState("");
    const [toDate, setToDate] = useState("");
    const [selectedLead, setSelectedLead] = useState(null);
+   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
    const [editOpen, setEditOpen] = useState(false);
 
    const [form] = Form.useForm();
@@ -182,6 +183,27 @@ export default function Leads() {
       } catch (err) {
          console.error(err);
          message.error("Failed to update lead");
+      }
+   };
+   const handleMultipleDelete = async () => {
+      if (selectedRowKeys.length === 0) {
+         message.warning("Please select at least one lead");
+         return;
+      }
+
+      try {
+         await deleteMultipleLeads(selectedRowKeys);
+
+         setLeads((prev) =>
+            prev.filter((lead) => !selectedRowKeys.includes(lead._id))
+         );
+
+         setSelectedRowKeys([]);
+
+         message.success("Selected leads deleted successfully");
+      } catch (err) {
+         console.error("Multiple Delete Error:", err);
+         message.error("Failed to delete selected leads");
       }
    };
 
@@ -423,11 +445,33 @@ export default function Leads() {
             >
                Export Contacts
             </Button>
+
+            {selectedRowKeys.length > 0 && (
+               <Popconfirm
+                  title={`Delete ${selectedRowKeys.length} selected lead(s)?`}
+                  description="This action cannot be undone."
+                  onConfirm={handleMultipleDelete}
+                  okText="Yes"
+                  cancelText="No"
+               >
+                  <Button danger icon={<DeleteOutlined />}>
+                     Delete Selected ({selectedRowKeys.length})
+                  </Button>
+               </Popconfirm>
+            )}
          </div>
+
+
 
          {/* Table */}
          <div className="leads-table-container">
             <Table
+               rowSelection={{
+                  selectedRowKeys,
+                  onChange: (selectedKeys) => {
+                     setSelectedRowKeys(selectedKeys);
+                  },
+               }}
                columns={columns}
                dataSource={filteredLeads}
                rowKey="_id"
