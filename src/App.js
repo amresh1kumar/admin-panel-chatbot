@@ -27,6 +27,7 @@ import AdminSubscriptions from "./pages/Admin/AdminSubscriptions";
 import FollowUpSettings from "./pages/FollowUpSettings";
 import CallingSettings from "./pages/CallingSettings";
 import Contacts from "./pages/Contacts";
+import WelcomeMessageSettings from "./pages/WelcomeMessageSettings";
 
 function App() {
   const { token } = useAuth();
@@ -48,9 +49,13 @@ function App() {
             <Route path="/bot-menus" element={<BotMenu />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/followup-settings" element={<FollowUpSettings />} />
+            <Route
+              path="/welcome-message-settings"
+              element={<WelcomeMessageSettings />}
+            />
             <Route path="/calling-settings" element={<CallingSettings />} />
             <Route path="/broadcast" element={<Broadcast />} />
-            <Route path="/contacts" element={<Contacts/>} />
+            <Route path="/contacts" element={<Contacts />} />
             <Route element={<AdminProtectedRoute />}>
               <Route path="/admin" element={<AdminDashboard />} />
 

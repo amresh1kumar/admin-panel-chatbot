@@ -158,10 +158,17 @@ export default function Sidebar() {
          children: [
             {
                key: '/followup-settings',
-               icon: <MessageOutlined />,  
+               icon: <MessageOutlined />,
                label: 'Follow-Up Settings',
                onClick: () =>
                   navigate('/followup-settings')
+            },
+            {
+               key: '/welcome-message-settings',
+               icon: <MessageOutlined />,
+               label: 'Welcome Message Settings',
+               onClick: () =>
+                  navigate('/welcome-message-settings')
             },
             {
                key: "/calling-settings",
@@ -177,7 +184,7 @@ export default function Sidebar() {
          ? [
             {
                key: 'admin',
-               icon: <SafetyCertificateOutlined  />,
+               icon: <SafetyCertificateOutlined />,
                label: 'Super Admin',
                children: [
                   {
