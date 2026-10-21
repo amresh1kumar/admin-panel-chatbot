@@ -32,6 +32,7 @@ export default function BotMessage() {
    const [templates, setTemplates] = useState([]);
    const [filePreview, setFilePreview] = useState(null);
    const [paramCount, setParamCount] = useState(0);
+   const [mediaItems, setMediaItems] = useState([]);
    const [form] = Form.useForm();
 
    const fetchData = async () => {
@@ -63,6 +64,40 @@ export default function BotMessage() {
    }, []);
 
    // ================= SUBMIT =================
+   // const onFinish = async (values) => {
+   //    try {
+   //       const formatted = {
+   //          ...values,
+
+   //          keywords: values.keywords
+   //             .split(",")
+   //             .map(k => k.trim().toLowerCase())
+   //             .filter(k => k !== ""),
+
+   //          action: values.action?.trim() || null,
+   //          params: values.params || []
+   //       };
+
+   //       if (editing) {
+   //          await updateBotMessage(editing._id, formatted);
+   //          message.success("Updated");
+   //       } else {
+   //          await createBotMessage(formatted);
+   //          message.success("Created");
+   //       }
+
+   //       setOpen(false);
+   //       setEditing(null);
+   //       form.resetFields();
+   //       fetchData();
+
+   //    } catch (err) {
+   //       console.error(err);
+   //       message.error(err.message || "Error saving message");
+   //    }
+   // };
+
+
    const onFinish = async (values) => {
       try {
          const formatted = {
@@ -70,11 +105,17 @@ export default function BotMessage() {
 
             keywords: values.keywords
                .split(",")
-               .map(k => k.trim().toLowerCase())
-               .filter(k => k !== ""),
+               .map((k) => k.trim().toLowerCase())
+               .filter((k) => k !== ""),
 
             action: values.action?.trim() || null,
-            params: values.params || []
+            // params: values.params || [],
+
+            mediaItems: mediaItems.map((item) => ({
+               url: item.url,
+               type: item.type,
+               caption: item.caption?.trim() || "",
+            })),
          };
 
          if (editing) {
@@ -87,28 +128,55 @@ export default function BotMessage() {
 
          setOpen(false);
          setEditing(null);
+         setMediaItems([]);
+         setFilePreview(null);
          form.resetFields();
          fetchData();
-
       } catch (err) {
          console.error(err);
          message.error(err.message || "Error saving message");
       }
    };
 
+
    // ================= EDIT =================
+   // const handleEdit = (record) => {
+   //    setEditing(record);
+   //    setOpen(true);
+   //    setFilePreview(record.mediaUrl || null);
+   //    setParamCount(record.params?.length || 0);
+
+   //    form.setFieldsValue({
+   //       ...record,
+   //       keywords: record.keywords?.join(","),
+   //       params: record.params || []
+   //    });
+   // };
+
+
+
    const handleEdit = (record) => {
       setEditing(record);
       setOpen(true);
+
       setFilePreview(record.mediaUrl || null);
+      setMediaItems(
+         (record.mediaItems || []).map((item) => ({
+            url: item.url,
+            type: item.type,
+            caption: item.caption || "",
+         }))
+      );
+
       setParamCount(record.params?.length || 0);
 
       form.setFieldsValue({
          ...record,
          keywords: record.keywords?.join(","),
-         params: record.params || []
+         params: record.params || [],
       });
    };
+
 
    // ================= DELETE =================
    const handleDelete = async (id) => {
@@ -121,6 +189,7 @@ export default function BotMessage() {
          message.error("Delete failed");
       }
    };
+
    const handleCustomUpload = async (file) => {
       try {
          const url = await uploadFile(file);
@@ -134,6 +203,48 @@ export default function BotMessage() {
       } catch (err) {
          message.error("Upload failed");
       }
+   };
+
+   const handleMultipleMediaUpload = async (file) => {
+      try {
+         const url = await uploadFile(file);
+
+         let type = "image";
+
+         if (file.type === "application/pdf") {
+            type = "document";
+         } else if (file.type.startsWith("video/")) {
+            type = "video";
+         }
+
+         setMediaItems((prev) => [
+            ...prev,
+            {
+               url,
+               type,
+               caption: ""
+            }
+         ]);
+
+         message.success(`${file.name} uploaded successfully`);
+      } catch (err) {
+         console.error(err);
+         message.error(`Upload failed: ${file.name}`);
+      }
+   };
+
+   const handleMediaCaptionChange = (index, caption) => {
+      setMediaItems((prev) =>
+         prev.map((item, i) =>
+            i === index ? { ...item, caption } : item
+         )
+      );
+   };
+
+   const handleRemoveMedia = (index) => {
+      setMediaItems((prev) =>
+         prev.filter((_, i) => i !== index)
+      );
    };
 
    const handleRemove = () => {
@@ -206,29 +317,104 @@ export default function BotMessage() {
          width: 150,
          render: (t) => t || "-"
       },
+
       {
          title: "Media",
-         dataIndex: "mediaUrl",
-         key: "mediaUrl",
-         width: 200,
-         render: (url) => {
-            if (!url) return "-";
+         key: "media",
+         width: 240,
+         render: (_, record) => {
+            const items =
+               Array.isArray(record.mediaItems) && record.mediaItems.length
+                  ? record.mediaItems
+                  : record.mediaUrl
+                     ? [{
+                        url: record.mediaUrl,
+                        type: null,
+                     }]
+                     : [];
 
-            if (url.match(/\.(jpeg|jpg|png|webp)$/)) {
-               return <img src={url} style={{ width: 40 }} />;
-            }
+            if (!items.length) return "-";
 
-            if (url.endsWith(".pdf")) {
-               return "📄 PDF";
-            }
+            return (
+               <div
+                  style={{
+                     display: "flex",
+                     gap: 8,
+                     flexWrap: "wrap",
+                     alignItems: "center",
+                  }}
+               >
+                  {items.map((item, index) => {
+                     const url = item.url;
+                     if (!url) return null;
 
-            if (url.match(/\.(mp4|webm)$/)) {
-               return "🎥 Video";
-            }
+                     const type =
+                        item.type ||
+                        (url.match(/\.(jpg|jpeg|png|webp|gif)(\?|$)/i)
+                           ? "image"
+                           : url.match(/\.pdf(\?|$)/i)
+                              ? "document"
+                              : url.match(/\.(mp4|webm|mov)(\?|$)/i)
+                                 ? "video"
+                                 : "document");
 
-            return "Media";
-         }
+                     if (type === "image") {
+                        return (
+                           <a
+                              key={`${url}-${index}`}
+                              href={url}
+                              target="_blank"
+                              rel="noreferrer"
+                              title="Open full image"
+                           >
+                              <img
+                                 src={url}
+                                 alt={`Media ${index + 1}`}
+                                 onError={(e) => {
+                                    e.currentTarget.style.display = "none";
+                                 }}
+                                 style={{
+                                    width: 20,
+                                    height: 20,
+                                    objectFit: "cover",
+                                    borderRadius: 6,
+                                    border: "1px solid #ddd",
+                                    display: "block",
+                                 }}
+                              />
+                           </a>
+                        );
+                     }
+
+                     if (type === "video") {
+                        return (
+                           <a
+                              key={`${url}-${index}`}
+                              href={url}
+                              target="_blank"
+                              rel="noreferrer"
+                           >
+                              🎥 Video {index + 1}
+                           </a>
+                        );
+                     }
+
+                     return (
+                        <a
+                           key={`${url}-${index}`}
+                           href={url}
+                           target="_blank"
+                           rel="noreferrer"
+                        >
+                           📄 PDF {index + 1}
+                        </a>
+                     );
+                  })}
+               </div>
+            );
+         },
       },
+
       {
          title: "Actions",
          key: "actions",
@@ -273,13 +459,16 @@ export default function BotMessage() {
                <Button
                   type="primary"
                   icon={<PlusOutlined />}
+
                   onClick={() => {
-                     setOpen(true);
                      setEditing(null);
                      form.resetFields();
                      setParamCount(0);
                      setFilePreview(null);
+                     setMediaItems([]);
+                     setOpen(true);
                   }}
+
                >
                   Add Message
                </Button>
@@ -306,11 +495,22 @@ export default function BotMessage() {
          <Modal
             open={open}
             title={editing ? "Edit Message" : "Add Message"}
+            // onCancel={() => {
+            //    setOpen(false);
+            //    setEditing(null);
+            //    form.resetFields();
+            // }}
+
+
             onCancel={() => {
                setOpen(false);
                setEditing(null);
                form.resetFields();
+               setMediaItems([]);
+               setFilePreview(null);
+               setParamCount(0);
             }}
+
             onOk={() => form.submit()}
             width={600}
             okText={editing ? "Update" : "Create"}
@@ -347,89 +547,92 @@ export default function BotMessage() {
                      Mark as Flow End
                   </Checkbox>
                </Form.Item>
-               <Form.Item name="templateName" label="Template (optional)">
-                  <Select placeholder="Select template" allowClear onChange={handleTemplateChange}>
-                     {templates
-                        .map(t => (
-                           <Select.Option key={t.name} value={t.name}>
-                              {t.name}
-                           </Select.Option>
-                        ))}
-                  </Select>
-
-               </Form.Item>
-
-               {paramCount > 0 && (
-                  <Form.Item label="Template Parameters">
-                     {Array.from({ length: paramCount }).map((_, i) => (
-                        <Form.Item
-                           key={i}
-                           name={["params", i]}
-                           rules={[{ required: true, message: "Required" }]}
-                        >
-                           <Input placeholder={`Enter value for {{${i + 1}}}`} />
-                        </Form.Item>
-                     ))}
-                  </Form.Item>
-               )}
+               
 
 
-               <Form.Item label="Upload File">
+               <Form.Item label="Upload Images / Videos / PDFs">
                   <Upload
                      showUploadList={false}
+                     multiple
                      beforeUpload={(file) => {
                         const valid = validateFile(file);
+
                         if (!valid) return false;
 
-                        handleCustomUpload(file);
+                        handleMultipleMediaUpload(file);
                         return false;
                      }}
                   >
-                     <Button>Upload File</Button>
+                     <Button>Upload Media</Button>
                   </Upload>
-                  {filePreview && (
-                     <div style={{ marginTop: 10 }}>
 
-                        {/* IMAGE PREVIEW */}
-                        {filePreview.match(/\.(jpeg|jpg|png|webp)$/) && (
+                  {mediaItems.map((item, index) => (
+                     <div
+                        key={`${item.url}-${index}`}
+                        style={{
+                           marginTop: 12,
+                           padding: 12,
+                           border: "1px solid #ddd",
+                           borderRadius: 8,
+                        }}
+                     >
+                        
+
+                        {item.type === "image" && (
                            <img
-                              src={filePreview}
-                              alt="preview"
-                              style={{ width: 120, borderRadius: 8 }}
+                              src={item.url}
+                              alt={`Media ${index + 1}`}
+                              onError={(e) => {
+                                 e.currentTarget.style.display = "none";
+                              }}
+                              style={{
+                                 width: "100%",
+                                 maxWidth: 200,
+                                 maxHeight: 200,
+                                 objectFit: "contain",
+                                 display: "block",
+                                 borderRadius: 8,
+                                 marginBottom: 12,
+                                 background: "#f5f5f5",
+                              }}
                            />
                         )}
 
-                        {/* PDF PREVIEW */}
-                        {filePreview.endsWith(".pdf") && (
-                           <div>
-                              📄 PDF Uploaded
+                        {item.type === "video" && (
+                           <video
+                              width="180"
+                              controls
+                              src={item.url}
+                              style={{ display: "block", marginBottom: 8 }}
+                           />
+                        )}
+
+                        {item.type === "document" && (
+                           <div style={{ marginBottom: 8 }}>
+                              📄 PDF Document {index + 1}
                            </div>
                         )}
 
-                        {/* VIDEO PREVIEW */}
-                        {filePreview.match(/\.(mp4|webm)$/) && (
-                           <video width="150" controls src={filePreview} />
-                        )}
+                        <Input
+                           placeholder="Enter caption for this media"
+                           value={item.caption}
+                           onChange={(e) =>
+                              handleMediaCaptionChange(index, e.target.value)
+                           }
+                           style={{ marginBottom: 8 }}
+                        />
 
-                        {/* REMOVE BUTTON */}
                         <Button
                            danger
                            size="small"
-                           style={{ marginTop: 5 }}
-                           onClick={handleRemove}
+                           onClick={() => handleRemoveMedia(index)}
                         >
                            Remove
                         </Button>
-
                      </div>
-                  )}
+                  ))}
                </Form.Item>
 
-
-
-               <Form.Item name="mediaUrl" label="Media URL (PDF/Image/Video)">
-                  <Input placeholder="https://example.com/file.pdf" />
-               </Form.Item>
             </Form>
          </Modal>
       </div>
