@@ -32,10 +32,8 @@ export default function UsersList({ onSelectUser }) {
 
    const filteredUsers = (users || []).filter(
       (user) =>
-         (user.name || "")
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
-         (user._id || "").includes(searchQuery)
+         (user.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+         (user._id || "").includes(searchQuery),
    );
 
    // Select / Unselect single chat
@@ -43,35 +41,24 @@ export default function UsersList({ onSelectUser }) {
       setSelectedPhones((prev) =>
          prev.includes(phone)
             ? prev.filter((item) => item !== phone)
-            : [...prev, phone]
+            : [...prev, phone],
       );
    };
 
    // Select / Unselect all visible chats
    const toggleSelectAll = () => {
-      const filteredPhones = filteredUsers.map(
-         (user) => user._id
-      );
+      const filteredPhones = filteredUsers.map((user) => user._id);
 
       const allSelected =
          filteredPhones.length > 0 &&
-         filteredPhones.every((phone) =>
-            selectedPhones.includes(phone)
-         );
+         filteredPhones.every((phone) => selectedPhones.includes(phone));
 
       if (allSelected) {
          setSelectedPhones((prev) =>
-            prev.filter(
-               (phone) => !filteredPhones.includes(phone)
-            )
+            prev.filter((phone) => !filteredPhones.includes(phone)),
          );
       } else {
-         setSelectedPhones((prev) => [
-            ...new Set([
-               ...prev,
-               ...filteredPhones,
-            ]),
-         ]);
+         setSelectedPhones((prev) => [...new Set([...prev, ...filteredPhones])]);
       }
    };
 
@@ -88,7 +75,6 @@ export default function UsersList({ onSelectUser }) {
          // Chat list fresh API se reload
          const data = await getUsers(tenantId);
          setUsers(data);
-
       } catch (err) {
          console.error("Clear Selected Chats Error:", err);
       }
@@ -119,14 +105,8 @@ export default function UsersList({ onSelectUser }) {
 
       // Difference in days
       const diffDays = Math.floor(
-         (now.setHours(0, 0, 0, 0) -
-            new Date(msgDate).setHours(
-               0,
-               0,
-               0,
-               0
-            )) /
-         (1000 * 60 * 60 * 24)
+         (now.setHours(0, 0, 0, 0) - new Date(msgDate).setHours(0, 0, 0, 0)) /
+         (1000 * 60 * 60 * 24),
       );
 
       // Yesterday
@@ -136,41 +116,29 @@ export default function UsersList({ onSelectUser }) {
 
       // Within last 7 days
       if (diffDays < 7) {
-         return msgDate.toLocaleDateString(
-            "en-US",
-            {
-               weekday: "short",
-            }
-         );
+         return msgDate.toLocaleDateString("en-US", {
+            weekday: "short",
+         });
       }
 
       // Older than 7 days
-      return msgDate.toLocaleDateString(
-         "en-GB",
-         {
-            day: "2-digit",
-            month: "2-digit",
-            year: "2-digit",
-         }
-      );
+      return msgDate.toLocaleDateString("en-GB", {
+         day: "2-digit",
+         month: "2-digit",
+         year: "2-digit",
+      });
    };
 
    const allFilteredSelected =
       filteredUsers.length > 0 &&
-      filteredUsers.every((user) =>
-         selectedPhones.includes(user._id)
-      );
+      filteredUsers.every((user) => selectedPhones.includes(user._id));
 
    return (
       <div className="users-list-container">
-
          {/* Header */}
          <div className="users-list-header">
-
             <h3 className="users-list-title">
-               {selectMode
-                  ? `${selectedPhones.length} Selected`
-                  : "Chats"}
+               {selectMode ? `${selectedPhones.length} Selected` : "Chats"}
             </h3>
 
             {!selectMode ? (
@@ -183,7 +151,6 @@ export default function UsersList({ onSelectUser }) {
                </button>
             ) : (
                <div className="select-mode-actions">
-
                   {/* Select All */}
                   <label className="select-all-button">
                      <input
@@ -191,7 +158,6 @@ export default function UsersList({ onSelectUser }) {
                         checked={allFilteredSelected}
                         onChange={toggleSelectAll}
                      />
-
                      Select All
                   </label>
 
@@ -231,7 +197,6 @@ export default function UsersList({ onSelectUser }) {
                   >
                      <CloseOutlined />
                   </button>
-
                </div>
             )}
          </div>
@@ -239,7 +204,6 @@ export default function UsersList({ onSelectUser }) {
          {/* Search */}
          <div className="search-bar-container">
             <div className="search-input-wrapper">
-
                <SearchOutlined className="search-icon" />
 
                <input
@@ -247,22 +211,17 @@ export default function UsersList({ onSelectUser }) {
                   placeholder="Search or start new chat"
                   className="search-input"
                   value={searchQuery}
-                  onChange={(e) =>
-                     setSearchQuery(e.target.value)
-                  }
+                  onChange={(e) => setSearchQuery(e.target.value)}
                />
-
             </div>
          </div>
 
          {/* Users List */}
          <div className="users-list-scroll">
-
             {filteredUsers.map((user, index) => (
                <div
                   key={user._id}
                   onClick={() => {
-
                      if (selectMode) {
                         toggleSelectUser(user._id);
                         return;
@@ -271,31 +230,19 @@ export default function UsersList({ onSelectUser }) {
                      setActiveUser(user._id);
                      onSelectUser(user._id);
                   }}
-                  className={`user-item ${activeUser === user._id
-                     ? "active"
-                     : ""
-                     }`}
+                  className={`user-item ${activeUser === user._id ? "active" : ""}`}
                   style={{
                      animationDelay: `${index * 0.05}s`,
                   }}
                >
-
                   {/* Checkbox */}
                   {selectMode && (
                      <input
                         type="checkbox"
                         className="chat-select-checkbox"
-                        checked={selectedPhones.includes(
-                           user._id
-                        )}
-                        onChange={() =>
-                           toggleSelectUser(
-                              user._id
-                           )
-                        }
-                        onClick={(e) =>
-                           e.stopPropagation()
-                        }
+                        checked={selectedPhones.includes(user._id)}
+                        onChange={() => toggleSelectUser(user._id)}
+                        onClick={(e) => e.stopPropagation()}
                      />
                   )}
 
@@ -306,61 +253,41 @@ export default function UsersList({ onSelectUser }) {
 
                   {/* User Info */}
                   <div className="user-info">
-
                      <div className="user-info-top">
-
                         <div className="user-details">
-
                            <div className="user-name">
-                              {user.name?.trim() ||
-                                 "Unknown"}
+                              {user.name?.trim() || "Unknown"}
                            </div>
 
-                           <div className="user-phone">
-                              {user._id}
-                           </div>
-
+                           <div className="user-phone">{user._id}</div>
                         </div>
 
                         <div className="user-timestamp">
                            {formatChatTime(
-                              user.lastMessageTime ||
-                              user.updatedAt ||
-                              user.createdAt
+                              user.lastMessageTime || user.updatedAt || user.createdAt,
                            )}
                         </div>
-
                      </div>
 
                      <div className="user-info-bottom">
-
                         <div className="user-last-message">
-                           {user.lastMessage ||
-                              "No messages yet"}
+                           {user.lastMessage || "No messages yet"}
                         </div>
-
                      </div>
-
                   </div>
-
                </div>
             ))}
 
             {/* Empty State */}
             {filteredUsers.length === 0 && (
                <div className="empty-state">
-
                   <UserOutlined className="empty-icon" />
 
                   <p className="empty-text">
-                     {searchQuery
-                        ? "No chats found"
-                        : "No chats yet"}
+                     {searchQuery ? "No chats found" : "No chats yet"}
                   </p>
-
                </div>
             )}
-
          </div>
       </div>
    );

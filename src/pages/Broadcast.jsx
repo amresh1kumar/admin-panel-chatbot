@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { getLeads } from "../services/leadService";
-import { getBroadcastHistory, sendBulkMessage } from "../services/broadcastService";
-import { Modal, Form, Input, message, Button, Select } from "antd";
-import { PlusOutlined, SearchOutlined, EyeOutlined } from "@ant-design/icons";
+import { getBroadcastHistory, sendBulkMessage, deleteBroadcast } from "../services/broadcastService";
+import { Modal, Form, Input, message, Button, Select, DatePicker, Radio, Popconfirm } from "antd";
+import dayjs from "dayjs"
+import { PlusOutlined, SearchOutlined, EyeOutlined, DeleteOutlined } from "@ant-design/icons";
 import { Table, Tag } from "antd";
 import "../styles/Broadcast.css"
 import { getContacts } from "../services/contactService";
@@ -31,6 +32,8 @@ export default function Broadcast() {
    const [batches, setBatches] = useState([]);
    const [syncLoading, setSyncLoading] = useState(false);
    const [sending, setSending] = useState(false);
+   const [sendMode, setSendMode] = useState("now");
+   const [selectedDate, setSelectedDate] = useState(null);
    const [form] = Form.useForm();
 
 
@@ -99,6 +102,29 @@ export default function Broadcast() {
       setDetailsModal(true);
    };
 
+   const handleDeleteBroadcast = async (id) => {
+      try {
+         await deleteBroadcast(id);
+
+         message.success("Broadcast deleted successfully");
+
+         setBroadcasts((prev) =>
+            prev.filter((item) => item._id !== id)
+         );
+
+         if (selectedBroadcast?._id === id) {
+            setDetailsModal(false);
+            setSelectedBroadcast(null);
+         }
+      } catch (err) {
+         console.error("Delete Broadcast Error:", err);
+
+         message.error(
+            err.response?.data?.message || "Failed to delete broadcast"
+         );
+      }
+   };
+
    const handleSyncTemplates = async () => {
 
       try {
@@ -106,7 +132,6 @@ export default function Broadcast() {
          setSyncLoading(true);
 
          const res = await syncTemplates();
-
          const data = await getTemplates();
 
          setTemplates(data || []);
@@ -124,29 +149,39 @@ export default function Broadcast() {
       }
 
    };
-
    const handleCreateBroadcast = async (values) => {
-      setSending(true);
-      try {
+      if (sendMode === "schedule") {
+         if (!selectedDate) {
+            message.error("Please select a schedule date and time");
+            return;
+         }
 
-         // let filteredLeads = leads;
+         if (!selectedDate.isAfter(dayjs())) {
+            message.error("Schedule time must be in the future");
+            return;
+         }
+      }
+
+      setSending(true);
+
+      try {
 
          let recipients = [];
 
          if (values.audienceType === "contact") {
-            recipients = contacts;
+            recipients = contacts.filter(
+               (contact) =>
+                  String(contact.batchId) === String(values.batchId)
+            );
          } else {
             recipients = leads;
          }
 
-         // if (values.audience !== "all") {
-         //    filteredLeads = leads.filter(
-         //       lead => lead.status === values.audience
-         //    );
-         // }
+         const ids = recipients.map((item) => item._id);
 
-         // const ids = filteredLeads.map(lead => lead._id);
-         const ids = recipients.map(item => item._id);
+         console.log("Selected Batch:", values.batchId);
+         console.log("Filtered Recipients:", recipients);
+         console.log("Recipient IDs:", ids);
 
          if (ids.length === 0) {
 
@@ -162,17 +197,18 @@ export default function Broadcast() {
             ids,
             name: values.name,
             audienceType: values.audienceType,
-
             type: values.type,
             batchId: values.batchId,
-
             message: values.message,
-
             templateName: values.templateName,
-
             params,
+            mediaUrl,
 
-            mediaUrl
+            sendMode,
+            scheduledAt:
+               sendMode === "schedule" && selectedDate
+                  ? selectedDate.format("YYYY-MM-DDTHH:mm:ss")
+                  : null,
          });
 
          message.success("Broadcast sent successfully");
@@ -280,19 +316,22 @@ export default function Broadcast() {
          title: "Status",
          dataIndex: "status",
          key: "status",
-         render: (status) => (
-            <Tag
-               color={
-                  status === "completed"
-                     ? "green"
-                     : status === "processing"
-                        ? "blue"
-                        : "red"
-               }
-            >
-               {status.toUpperCase()}
-            </Tag>
-         )
+         render: (status) => {
+            const statusConfig = {
+               completed: { color: "green", label: "Completed" },
+               processing: { color: "blue", label: "Processing" },
+               scheduled: { color: "orange", label: "Scheduled" },
+               failed: { color: "red", label: "Failed" },
+               pending: { color: "default", label: "Pending" },
+            };
+
+            const config = statusConfig[status?.toLowerCase()] || {
+               color: "default",
+               label: status || "Unknown",
+            };
+
+            return <Tag color={config.color}>{config.label}</Tag>;
+         },
       },
 
       {
@@ -321,19 +360,41 @@ export default function Broadcast() {
             new Date(date).toLocaleDateString("en-GB")
       },
 
+
       {
          title: "Action",
          key: "action",
          render: (_, record) => (
-            <Button
-               icon={<EyeOutlined />}
-               size="small"
-               onClick={() => openDetailsModal(record)}
-            >
-               View
-            </Button>
-         )
+            <div style={{ display: "flex", gap: 8 }}>
+               <Button
+                  icon={<EyeOutlined />}
+                  size="small"
+                  onClick={() => openDetailsModal(record)}
+               >
+                  View
+               </Button>
+
+               <Popconfirm
+                  title="Delete Broadcast?"
+                  description={`Are you sure you want to delete "${record.name}"?`}
+                  onConfirm={() => handleDeleteBroadcast(record._id)}
+                  okText="Yes, Delete"
+                  cancelText="Cancel"
+                  okButtonProps={{ danger: true }}
+               >
+                  <Button
+                     danger
+                     icon={<DeleteOutlined />}
+                     size="small"
+                     disabled={record.status === "processing"}
+                  >
+                     Delete
+                  </Button>
+               </Popconfirm>
+            </div>
+         ),
       }
+
    ];
    return (
       <div className="broadcast-page">
@@ -391,22 +452,15 @@ export default function Broadcast() {
             <Select
                placeholder="Filter by status"
                style={{ width: 200 }}
-               value={statusFilter}
+               value={statusFilter || undefined}
                onChange={(value) => setStatusFilter(value)}
                allowClear
                options={[
-                  {
-                     value: "completed",
-                     label: "Completed"
-                  },
-                  {
-                     value: "processing",
-                     label: "Processing"
-                  },
-                  {
-                     value: "failed",
-                     label: "Failed"
-                  }
+                  { value: "scheduled", label: "Scheduled" },
+                  { value: "processing", label: "Processing" },
+                  { value: "completed", label: "Completed" },
+                  { value: "failed", label: "Failed" },
+                  { value: "pending", label: "Pending" },
                ]}
             />
 
@@ -438,6 +492,47 @@ export default function Broadcast() {
                form={form}
                onFinish={handleCreateBroadcast}
             >
+
+               <Form.Item label="Send When">
+                  <Radio.Group
+                     value={sendMode}
+                     onChange={(e) => {
+                        setSendMode(e.target.value);
+                        setSelectedDate(null);
+                     }}
+                     options={[
+                        { label: "Send Now", value: "now" },
+                        { label: "Schedule for Later", value: "schedule" },
+                     ]}
+                  />
+               </Form.Item>
+
+               {sendMode === "schedule" && (
+                  <Form.Item
+                     label="Schedule Date & Time"
+                     required
+                     validateStatus={
+                        !selectedDate ? "error" : ""
+                     }
+                     help={
+                        !selectedDate
+                           ? "Please select a schedule date and time"
+                           : null
+                     }
+                  >
+                     <DatePicker
+                        showTime
+                        style={{ width: "100%" }}
+                        format="DD-MM-YYYY HH:mm"
+                        value={selectedDate}
+                        onChange={setSelectedDate}
+                        disabledDate={(current) =>
+                           current && current.endOf("day").valueOf() < Date.now()
+                        }
+                        placeholder="Select future date and time"
+                     />
+                  </Form.Item>
+               )}
 
                <Form.Item
                   label="Campaign Name"
@@ -518,14 +613,14 @@ export default function Broadcast() {
                <Form.Item
                   label="Message Type"
                   name="type"
-                  initialValue="text"
+                  initialValue="template"
                >
                   <Select
                      options={[
-                        {
-                           label: "Text",
-                           value: "text"
-                        },
+                        // {
+                        //    label: "Text",
+                        //    value: "text"
+                        // },
                         {
                            label: "Template",
                            value: "template"
@@ -777,13 +872,13 @@ export default function Broadcast() {
                   loading={sending}
                   disabled={sending}
                >
-                  Send Broadcast
+                  {sendMode === "schedule" ? "Schedule Broadcast" : "Send Broadcast"}
                </Button>
 
             </Form>
          </Modal>
 
-         <Modal
+         {/* <Modal
             title="Broadcast Details"
             open={detailsModal}
             onCancel={() => setDetailsModal(false)}
@@ -952,7 +1047,220 @@ export default function Broadcast() {
 
                </div>
             )}
+         </Modal> */}
+
+
+         <Modal
+            title="Broadcast Details"
+            open={detailsModal}
+            onCancel={() => setDetailsModal(false)}
+            footer={null}
+            styles={{
+               body: {
+                  maxHeight: "70vh",
+                  overflowY: "auto",
+                  paddingRight: 8,
+               },
+            }}
+         >
+            {selectedBroadcast && (() => {
+               const broadcast = selectedBroadcast;
+
+               const statusColors = {
+                  completed: "#389e0d",
+                  processing: "#1677ff",
+                  scheduled: "#d48806",
+                  failed: "#cf1322",
+                  pending: "#8c8c8c",
+               };
+
+               const total = Number(broadcast.total || 0);
+               const sent = Number(broadcast.sent || 0);
+               const failed = Number(broadcast.failed || 0);
+               const successRate =
+                  total > 0 ? ((sent / total) * 100).toFixed(1) : "0.0";
+
+               const formatDate = (date) => {
+                  if (!date) return "—";
+
+                  const parsedDate = new Date(date);
+
+                  return Number.isNaN(parsedDate.getTime())
+                     ? "—"
+                     : parsedDate.toLocaleString("en-IN");
+               };
+
+               const Detail = ({ label, children }) => (
+                  <div
+                     className="broadcast-detail-item"
+                     style={{ marginBottom: 16 }}
+                  >
+                     <strong>{label}:</strong>
+                     <p style={{ margin: "4px 0 0", overflowWrap: "anywhere" }}>
+                        {children ?? "—"}
+                     </p>
+                  </div>
+               );
+
+               return (
+                  <div className="broadcast-details">
+                     <h3>Campaign Information</h3>
+
+                     <Detail label="Campaign">
+                        {broadcast.name}
+                     </Detail>
+
+                     <Detail label="Broadcast ID">
+                        {broadcast._id}
+                     </Detail>
+
+                     <Detail label="Audience">
+                        {broadcast.audienceType === "lead" ? "Lead" : "Contact"}
+                     </Detail>
+
+                     <Detail label="Message Type">
+                        {broadcast.type === "template" ? "Template" : "Text"}
+                     </Detail>
+
+                     {broadcast.batchId && (
+                        <Detail label="Import Batch ID">
+                           {String(broadcast.batchId)}
+                        </Detail>
+                     )}
+
+                     <Detail label="Status">
+                        <Tag color={statusColors[broadcast.status] || "default"}>
+                           {broadcast.status?.toUpperCase() || "UNKNOWN"}
+                        </Tag>
+                     </Detail>
+
+                     <Detail label="Created">
+                        {formatDate(broadcast.createdAt)}
+                     </Detail>
+
+                     <Detail label="Last Updated">
+                        {formatDate(broadcast.updatedAt)}
+                     </Detail>
+
+                     <Detail label="Scheduled At">
+                        {formatDate(broadcast.scheduledAt)}
+                     </Detail>
+
+                     <h3>Message Details</h3>
+
+                     {broadcast.type === "template" && (
+                        <>
+                           <Detail label="Template Name">
+                              {broadcast.templateName}
+                           </Detail>
+
+                           <Detail label="Template Label">
+                              {broadcast.templateLabel || broadcast.templateName}
+                           </Detail>
+
+                           <Detail label="Template Body">
+                              {broadcast.templateBody || "Not available"}
+                           </Detail>
+
+                           <Detail label="Language">
+                              {broadcast.templateLanguage || broadcast.language || "Not stored"}
+                           </Detail>
+                        </>
+                     )}
+
+                     {broadcast.message && (
+                        <Detail label="Message">
+                           {broadcast.message}
+                        </Detail>
+                     )}
+
+                     {broadcast.params?.length > 0 && (
+                        <Detail label="Parameters">
+                           {broadcast.params.join(", ")}
+                        </Detail>
+                     )}
+
+                     {broadcast.mediaUrl && (
+                        <div className="broadcast-detail-item" style={{ marginBottom: 16 }}>
+                           <strong>Media Attachment:</strong>
+
+                           <div style={{ marginTop: 8 }}>
+                              {/\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i.test(broadcast.mediaUrl) && (
+                                 <img
+                                    src={broadcast.mediaUrl}
+                                    alt="Broadcast media"
+                                    style={{
+                                       maxWidth: "100%",
+                                       width: 220,
+                                       borderRadius: 8,
+                                    }}
+                                 />
+                              )}
+
+                              {/\.(mp4|webm)(\?.*)?$/i.test(broadcast.mediaUrl) && (
+                                 <video
+                                    width="100%"
+                                    style={{ maxWidth: 320, borderRadius: 8 }}
+                                    controls
+                                    src={broadcast.mediaUrl}
+                                 />
+                              )}
+
+                              {/\.pdf(\?.*)?$/i.test(broadcast.mediaUrl) && (
+                                 <a
+                                    href={broadcast.mediaUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                 >
+                                    View PDF
+                                 </a>
+                              )}
+
+                              <div style={{ marginTop: 8 }}>
+                                 <a
+                                    href={broadcast.mediaUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                 >
+                                    Open media URL
+                                 </a>
+                              </div>
+                           </div>
+                        </div>
+                     )}
+
+                     <h3>Delivery Statistics</h3>
+
+                     <Detail label="Total Recipients">
+                        {total}
+                     </Detail>
+
+                     <Detail label="Sent Successfully">
+                        {sent}
+                     </Detail>
+
+                     <Detail label="Failed">
+                        {failed}
+                     </Detail>
+
+                     <Detail label="Success Rate">
+                        {successRate}%
+                     </Detail>
+
+                     <Detail label="Recipient IDs Stored">
+                        {broadcast.recipientIds?.length || 0}
+                     </Detail>
+
+                     {broadcast.recipientIds?.length > 0 && (
+                        <Detail label="Recipient IDs">
+                           {broadcast.recipientIds.map((id) => String(id)).join(", ")}
+                        </Detail>
+                     )}
+                  </div>
+               );
+            })()}
          </Modal>
+
       </div>
    );
 }

@@ -1,150 +1,50 @@
-// import API from "../api/api";
-
-// export const sendBulkMessage = async ({
-//    ids,
-//    message,
-//    name,
-//    audienceType
-// }) => {
-//    try {
-
-//       const res = await API.post("/bulk-message", {
-//          ids,
-//          message,
-//          name,
-//          audienceType
-//       });
-
-//       return res.data;
-
-//    } catch (err) {
-
-//       console.error(
-//          "Bulk Message Error:",
-//          err.response?.data || err.message
-//       );
-
-//       throw err;
-//    }
-// };
-
-// export const getBroadcastHistory = async ({
-//    search = "",
-//    status = ""
-// } = {}) => {
-
-//    try {
-
-//       const res = await API.get("/history", {
-//          params: {
-//             search,
-//             status
-//          }
-//       });
-
-//       return res.data;
-
-//    } catch (err) {
-
-//       console.error(
-//          "Broadcast History Error:",
-//          err.response?.data || err.message
-//       );
-
-//       throw err;
-//    }
-
-// };
-
-
 import API from "../api/api";
 
-export const sendBulkMessage = async ({
-   // ids,
-   // name,
-   // audienceType,
-
-   // // Text
-   // message,
-
-   // // Template
-   // type = "text",
-   // templateName = "",
-   // params = [],
-   // mediaUrl = ""
-
-   ids,
-   message,
-   name,
-   audienceType,
-   batchId,
-   type,
-   templateName,
-   params,
-   mediaUrl
-}) => {
+export const sendBulkMessage = async ({ ids, message, name, audienceType, batchId, type, templateName, params, mediaUrl, sendMode, scheduledAt, }) => {
    try {
-
       const res = await API.post("/bulk-message", {
-         // ids,
-         // name,
-         // audienceType,
-
-         // message,
-
-         // type,
-         // templateName,
-         // params,
-         // mediaUrl
-
-         ids,
-         message,
-         name,
-         audienceType,
-         batchId,
-         type,
-         templateName,
-         params,
-         mediaUrl
+         ids, message, name, audienceType, batchId, type,
+         templateName, params, mediaUrl, sendMode, scheduledAt,
       });
 
       return res.data;
-
    } catch (err) {
+      console.error("Bulk Message Error:", err.response?.data || err.message);
 
+      throw err;
+   }
+};
+
+export const getBroadcastHistory = async ({ search = "", status = "", } = {}) => {
+   try {
+      const res = await API.get("/history", {
+         params: {
+            search,
+            status,
+         },
+      });
+
+      return res.data;
+   } catch (err) {
       console.error(
-         "Bulk Message Error:",
-         err.response?.data || err.message
+         "Broadcast History Error:",
+         err.response?.data || err.message,
       );
 
       throw err;
    }
 };
 
-export const getBroadcastHistory = async ({
-   search = "",
-   status = ""
-} = {}) => {
-
+export const deleteBroadcast = async (id) => {
    try {
-
-      const res = await API.get("/history", {
-         params: {
-            search,
-            status
-         }
-      });
-
+      const res = await API.delete(`/broadcast/${id}`);
       return res.data;
-
    } catch (err) {
-
       console.error(
-         "Broadcast History Error:",
+         "Delete Broadcast Error:",
          err.response?.data || err.message
       );
 
       throw err;
    }
-
 };
